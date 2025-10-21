@@ -19,7 +19,9 @@ library(gets) ### main package for break detection - see Pretis, Reade, and Suca
 plot_show <- FALSE ###show plots during break detection
 
 #### Break detection calibration
-p_alpha <- 0.000001 ## level of significance for the detection of breaks (main calibration choice)
+# p_alpha <- 0.000001 ## level of significance for the detection of breaks (main calibration choice)
+ratio_threshold <- as.numeric(arguments[5])
+p_threshold <- as.numeric(arguments[6]) ## level of significance for the detection of breaks (main calibration choice)
 
 ### Computational
 parallel <- NULL ### set as integer (=number of cores-1) if selection should run in parallel (may increase speed for longer time series)
@@ -33,10 +35,12 @@ data.pick <- read.csv(arguments[2], header=TRUE)   #load raw input data
 ############################################
 
 pick.rel <- grep(variable , names(data.pick)) 
+data_names = names(data.pick)[pick.rel]
 
-month.c  <-  as.POSIXct(as.numeric(as.character(data.pick$month)),origin="1970-01-01",tz="GMT")
+month.c  <-  as.POSIXct(data.pick$month,origin="1970-01-01",tz="GMT")
 
-data.pick <- data.frame(month.c, data.pick[,pick.rel]) 
+data.pick <- data.frame(month.c, data.pick[,pick.rel])
+colnames(data.pick)[2:ncol(data.pick)] = data_names
 
 names.rel <- names(data.pick)[pick.rel]
 vars <- length(pick.rel)
@@ -63,13 +67,15 @@ withCallingHandlers({
     ###Main Break Detection Function (tis=TRUE searches for trend breaks) - called from "gets" package
     if (sum(is.na(y))==0){ ## if there are no missing values
       islstr.res <- isat(y,
-                         t.pval=p_alpha,
+                         t.pval=p_threshold,
                          sis = FALSE,
                          tis = TRUE,
                          iis = FALSE,
                          plot=plot_show,
                          parallel.options = parallel,
-                         max.block.size = 15)
+                         ratio.threshold = ratio_threshold,
+                         max.block.size = 15
+                         )
     } else {
       ### Create missing value indicator
       m <- is.na(y)
@@ -78,12 +84,13 @@ withCallingHandlers({
       y[is.na(y)] <- -1
       
       islstr.res <- isat(y,
-                         t.pval=p_alpha,
+                         t.pval=p_threshold,
                          sis = FALSE,
                          tis = TRUE,
                          iis = FALSE,
                          plot=plot_show,
                          parallel.options = parallel,
+                         ratio.threshold = ratio_threshold,
                          max.block.size = 12,
                          mxreg = m)
     }

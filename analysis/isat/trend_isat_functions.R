@@ -24,6 +24,7 @@ trend.var <- function(x, mxfull=NULL, mxbreak="tis"){
       names(coef.var) <- c("tis", "coef", "se")
       coef.var$tis <- names(coefficients(x)[relvar])
       coef.var$coef <- cumsum(rel.coefs)
+      coef.var$rel.coef <- rel.coefs
       
       ##find the timing:
       rel.mx <- grep(mxbreak, x$ISnames)

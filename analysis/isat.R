@@ -8,6 +8,7 @@ library(caTools)
 library(stringr)
 library(ggplot2)
 library(scales)
+library('forecast')
 
 source("analysis/design.R")
 # source("analysis/isat/change_detection.R")
@@ -20,30 +21,35 @@ df_atorvastatin <- read_csv(here::here(directory_name,"atorvastatin_list.csv")) 
   group_by(month,regional_team) %>%
   summarise(items=sum(items),
             total_list_size=mean(total_list_size),
-            rate = items / total_list_size)  %>%
+            rate = items / total_list_size * 1000)  %>%
   ungroup()
+
+# df_atorvastatin_30 <- min(df_atorvastatin$month) + months(30)
 
 df_inclisiran <- read_csv(here::here(directory_name,"inclisiran_list.csv")) %>%
   group_by(month,regional_team) %>%
   summarise(items=sum(items),
-            total_list_size=mean(total_list_size),
+            total_list_size=mean(total_list_size * 1000),
             rate = items / total_list_size) %>%
   ungroup()
+
+# df_inclisiran_30 <- min(df_inclisiran$month) + months(30)
 
 df_tirzepatide <- read_csv(here::here(directory_name,"tirzepatide_list.csv")) %>%
   group_by(month,regional_team) %>%
   summarise(items=sum(items),
             total_list_size=mean(total_list_size),
-            rate = items / total_list_size) %>%
-  ungroup()
+            rate = items / total_list_size * 1000) %>%
+  ungroup() 
 
+# df_tirzepatide_30 <- min(df_tirzepatide$month) + months(30)
 
 df_regions <- read_csv(here::here("data","NHS_England_Names_and_Codes_in_England.csv")) %>%
       rename(regional_team = NHSER24CDH ,region = NHSER24NM) 
 
 get_data<-function(bnf_name){
       assign("df",get(glue("df_{bnf_name}")) %>%
-               left_join(df_regions), envir = .GlobalEnv) 
+               left_join(df_regions), envir = .GlobalEnv)
 }
 
 
@@ -55,6 +61,8 @@ exploratory_plots <-function(df,bnf_name){
      scale_y_continuous(labels = label_comma()) +
      scale_x_date(date_breaks = "4 months") +
      theme(axis.text.x = element_text(angle =90)) +
+     geom_vline(xintercept=get(glue("date_{bnf_name}_ng")), linetype="dashed") +
+    geom_vline(xintercept=get(glue("date_{bnf_name}_diab")), linetype="dotted") +
      ylab("Rate")
          
    ggsave(
@@ -65,8 +73,8 @@ exploratory_plots <-function(df,bnf_name){
        glue(bnf_name,"_region_plot.png")),
      df_plot,
      dpi = 600,
-     width = 80,
-     height = 30,
+     width = 40,
+     height = 15,
      units = "cm"
    )
 
@@ -90,7 +98,8 @@ shape_dataframe<-function(df){
 
 data_pick<-function(df_shape){
   assign("df.pick",df_shape %>%
-           select(month,contains("ratio_quantity")),
+           select(month,contains("ratio_quantity")) %>%
+           arrange(region,month),
          envir = .GlobalEnv)
   
   assign("names.rel", names(df.pick %>% 
@@ -435,7 +444,7 @@ for (i in 1:(vars)) {
         }
       }
     }
-    #abline(v=known.t, lty=1, col="blue", lwd=2)### known intervention, blue dottedwarnings()
+    abline(v=known.t, lty=1, col="green", lwd=2)### known intervention, blue dottedwarnings()
     
     #print(names.rel[i])
     dev.off()
