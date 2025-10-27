@@ -67,8 +67,1169 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="openprescibing">OpenPrescibing</h2>
 <p>NHS Digital publishes monthly and annual prescribing datasets from the NHS Business Services Authority, along with static reports on prescribing trends. However, this does not allow readers to interrogate topics of interest in detail, and the large datasets can be complex to manage. OpenPrescribing.net is a service that facilitates exploration of outliers and trends for individual general practices in NHS England. OpenPrescribing aggregates all available prescription cost analysis (PCA) data into a single data frame for longitudinal analysis of trends, to generate an interactive online service where any user can explore and monitor time trends in prescribing using the latest available data and to share all resources for reuse by others as open data. This data is available from 2010 onwards. All data is normalised to enable the exploration of prescribing trends for individual members of a class of drugs over time. To achieve this consistency, each drug is mapped to its current position in the latest BNF dictionary up to the level of its 11-character ‘product’ code through an incremental process. For every General Practice (GP) in England, the cost and quantity of dispensed prescriptions by drug is published. GP practice data is attributed to LSOA spatial units via NHS Digital’s GP practice register datasets, allowing GP-level prescribing to be approximated at neighbourhood-level. This data is not linked to patient-level data so does not allow for identification of sub-populations of interest.</p>
 <p>The data used here is downloaded from <a href="www.openprescibing.net"><strong>OpenPrescribing</strong></a> using BigQuery via the notebooks in the <a href="https://github.com/andrewscolm/op_indicator_saturation/blob/master/notebooks">notebook directory</a>.</p>
-<p>5 separate tables are queried. - <code>ebmdatalab.hscic.normalised_prescribing</code> - <code>ebmdatalab.hscic.practices</code> - <code>hscic.practice_statistics</code> - <code>ebmdatalab.hscic.ccg</code> - <code>hscic.bnf</code></p>
+<p>5 tables are queried.</p>
+<ul>
+<li><p><code>ebmdatalab.hscic.normalised_prescribing</code></p>
+<ul>
+<li><p>practice</p></li>
+<li><p>month</p></li>
+<li><p>regional_team</p></li>
+<li><p>bnf_name</p></li>
+<li><p>chemical</p></li>
+<li><p>items</p></li>
+<li><p>quantity</p></li>
+</ul></li>
+<li><p><code>ebmdatalab.hscic.practices</code></p>
+<ul>
+<li><p>code</p></li>
+<li><p>setting</p></li>
+</ul></li>
+<li><p><code>hscic.practice_statistics</code></p>
+<ul>
+<li><p>month</p></li>
+<li><p>total_list_size</p></li>
+<li><p>pct_id</p></li>
+<li><p>practice</p></li>
+<li><p>name</p></li>
+<li><p>ccg_id</p></li>
+<li><p>pcn_id</p></li>
+<li><p>status_code</p></li>
+</ul></li>
+<li><p><code>ebmdatalab.hscic.ccg</code></p>
+<ul>
+<li><p>regional_team_id</p></li>
+<li><p>code</p></li>
+</ul></li>
+<li><p><code>hscic.bnf</code></p>
+<ul>
+<li>presentation_code</li>
+</ul></li>
+</ul>
 <p>Data is stored in the <a href="https://github.com/andrewscolm/op_indicator_saturation/blob/master/data">data</a> folder.</p>
+</section>
+<section id="practices-contributing-to-all-months." class="level2">
+<h2 class="anchored" data-anchor-id="practices-contributing-to-all-months.">Practices contributing to all months.</h2>
+<p>`</p>
+<p>6,164 of 6,858 practices prescribed atorvastatin throughout the study period. 694 practices will be lost by restricting to practices which prescribe every month of the study. These practices contribute 7,233,380 prescribed items and a total list size of 7,233,380 throughout the study period.</p>
+</section>
+<section id="missing-sub-icb-locations" class="level2">
+<h2 class="anchored" data-anchor-id="missing-sub-icb-locations">Missing Sub ICB Locations</h2>
+<p>The list size, Sub ICB Location, and practice name come from the <code>practice_statistics</code> table. This table does not include information for all of the practices.</p>
+<p>There are 402 practices missing from the <code>practice_statistics</code> table, contributing 4,473 months of data. Practices are missing across all regions.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="ailzlyuzma" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ailzlyuzma table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ailzlyuzma thead, #ailzlyuzma tbody, #ailzlyuzma tfoot, #ailzlyuzma tr, #ailzlyuzma td, #ailzlyuzma th {
+  border-style: none;
+}
+
+#ailzlyuzma p {
+  margin: 0;
+  padding: 0;
+}
+
+#ailzlyuzma .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 10px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ailzlyuzma .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ailzlyuzma .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ailzlyuzma .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ailzlyuzma .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ailzlyuzma .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ailzlyuzma .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ailzlyuzma .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ailzlyuzma .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ailzlyuzma .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ailzlyuzma .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ailzlyuzma .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ailzlyuzma .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ailzlyuzma .gt_row {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ailzlyuzma .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ailzlyuzma .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ailzlyuzma .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ailzlyuzma .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ailzlyuzma .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ailzlyuzma .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ailzlyuzma .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ailzlyuzma .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ailzlyuzma .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ailzlyuzma .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ailzlyuzma .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ailzlyuzma .gt_left {
+  text-align: left;
+}
+
+#ailzlyuzma .gt_center {
+  text-align: center;
+}
+
+#ailzlyuzma .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ailzlyuzma .gt_font_normal {
+  font-weight: normal;
+}
+
+#ailzlyuzma .gt_font_bold {
+  font-weight: bold;
+}
+
+#ailzlyuzma .gt_font_italic {
+  font-style: italic;
+}
+
+#ailzlyuzma .gt_super {
+  font-size: 65%;
+}
+
+#ailzlyuzma .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ailzlyuzma .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ailzlyuzma .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ailzlyuzma .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ailzlyuzma .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ailzlyuzma .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ailzlyuzma .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#ailzlyuzma .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#ailzlyuzma div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings header">
+<th id="region" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">region</th>
+<th id="n" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">n</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">East of England</td>
+<td class="gt_row gt_right" headers="n" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">45</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">London</td>
+<td class="gt_row gt_right" headers="n" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">46</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+<td class="gt_row gt_right" headers="n" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">69</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">North East and Yorkshire</td>
+<td class="gt_row gt_right" headers="n" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">76</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">North West</td>
+<td class="gt_row gt_right" headers="n" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">55</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">South East</td>
+<td class="gt_row gt_right" headers="n" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">70</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">South West</td>
+<td class="gt_row gt_right" headers="n" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">40</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NA</td>
+<td class="gt_row gt_right" headers="n" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="practice-settings" class="level2">
+<h2 class="anchored" data-anchor-id="practice-settings">Practice Settings</h2>
+<p>The <code>ebmdatalab.hscic.practices</code> table is used to restrict the datasets to GP settings. However, this does not always perfectly restrict to typical GP practices. Further work needs to be applied in order to identify atypical practices such as special allocation scheme, specialist, urgent, asylum, pilot or nursing home practices. I used the following terms to try to identify each practice type from the practice name:</p>
+<ul>
+<li>special allocation scheme practice
+<ul>
+<li>“SAS”</li>
+<li>“Special Allocation”</li>
+<li>“Select care”</li>
+<li>“SPCL”</li>
+</ul></li>
+<li>specialist practice
+<ul>
+<li>“Specialist”</li>
+</ul></li>
+<li>urgent care
+<ul>
+<li>“urgent”</li>
+</ul></li>
+<li>asylum practice
+<ul>
+<li>asylum</li>
+</ul></li>
+<li>pilot practice
+<ul>
+<li>“Pilot”</li>
+</ul></li>
+<li>nursing home practice
+<ul>
+<li>“nurs”</li>
+<li>“one care”</li>
+</ul></li>
+<li>Walk-in centres
+<ul>
+<li>“walk-”</li>
+<li>“walk in”</li>
+</ul></li>
+</ul>
+<p>In total, we identified 18 atypical practices. This comprised 12 special allocation scheme practices, 1 specialist scheme practice,1 urgent care practice, 1 asylum practice, 1 pilot scheme practice and 1 nursing home practice. Filtering practices by a minimum list size is sometimes used to remove these atypical practices. The following table contains the maximum list size of each identified atypical practice during the study period.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="nexorhdqhd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#nexorhdqhd table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#nexorhdqhd thead, #nexorhdqhd tbody, #nexorhdqhd tfoot, #nexorhdqhd tr, #nexorhdqhd td, #nexorhdqhd th {
+  border-style: none;
+}
+
+#nexorhdqhd p {
+  margin: 0;
+  padding: 0;
+}
+
+#nexorhdqhd .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 10px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#nexorhdqhd .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#nexorhdqhd .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#nexorhdqhd .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#nexorhdqhd .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#nexorhdqhd .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#nexorhdqhd .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#nexorhdqhd .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#nexorhdqhd .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#nexorhdqhd .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#nexorhdqhd .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#nexorhdqhd .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#nexorhdqhd .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#nexorhdqhd .gt_row {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#nexorhdqhd .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nexorhdqhd .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#nexorhdqhd .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#nexorhdqhd .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#nexorhdqhd .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nexorhdqhd .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#nexorhdqhd .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nexorhdqhd .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#nexorhdqhd .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nexorhdqhd .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#nexorhdqhd .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#nexorhdqhd .gt_left {
+  text-align: left;
+}
+
+#nexorhdqhd .gt_center {
+  text-align: center;
+}
+
+#nexorhdqhd .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#nexorhdqhd .gt_font_normal {
+  font-weight: normal;
+}
+
+#nexorhdqhd .gt_font_bold {
+  font-weight: bold;
+}
+
+#nexorhdqhd .gt_font_italic {
+  font-style: italic;
+}
+
+#nexorhdqhd .gt_super {
+  font-size: 65%;
+}
+
+#nexorhdqhd .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#nexorhdqhd .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#nexorhdqhd .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#nexorhdqhd .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#nexorhdqhd .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#nexorhdqhd .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#nexorhdqhd .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#nexorhdqhd .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#nexorhdqhd div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings header">
+<th id="practice" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">practice</th>
+<th id="name" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">name</th>
+<th id="type" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">type</th>
+<th id="highest_list_size" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">maximum list size</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y00081</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">locala kirklees sas</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">45</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y02526</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">phl sas service</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">8501</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y02645</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">locala calderdale sas</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y03103</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">medicus select care</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">309</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y03584</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">llr sas provider</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">112</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y06095</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">hertfordshire special allocation scheme</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">23</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y06389</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">sas mid and south essex stp</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">1251</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y06545</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">sel special allocation practice</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">401</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y06592</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme (nel)</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">224</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y07040</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">medicus select care blmk ccg</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">117</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y07819</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">spcl surgery</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">51</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y08082</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">bassetlaw sas practice</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">special allocation scheme</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">9</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y07697</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">wigan borough specialist services</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">specialist</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">245</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y02495</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">urgent treatment centre</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">urgent care</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">712</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y05412</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">south wigston asylum service</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">asylum</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">71</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y08124</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">omnia mvp pilot</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">pilot</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">49</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y08411</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">one care lewisham</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">nursing home</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">313</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">F84632</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">the greenhouse walk-in</td>
+<td class="gt_row gt_left" headers="type" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">walk-in</td>
+<td class="gt_row gt_right" headers="highest_list_size" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">1473</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 </section>
 <section id="practices-lost-when-filtering-to-20mg." class="level2">
 <h2 class="anchored" data-anchor-id="practices-lost-when-filtering-to-20mg.">Practices lost when filtering to 20mg.</h2>
@@ -76,30 +1237,30 @@ ul.task-list li input[type="checkbox"] {
 <p>Over the entire study period there are 6,858 prescribing atorvastatin, with 6,845 prescribing 20mg strength. We lose 13 practices by restricting to 20mg prescriptions. The practices dropped are as follows:</p>
 <div class="cell">
 <div class="cell-output-display">
-<div id="tbvrsvfdoi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#tbvrsvfdoi table {
+<div id="eazpuahcen" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#eazpuahcen table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#tbvrsvfdoi thead, #tbvrsvfdoi tbody, #tbvrsvfdoi tfoot, #tbvrsvfdoi tr, #tbvrsvfdoi td, #tbvrsvfdoi th {
+#eazpuahcen thead, #eazpuahcen tbody, #eazpuahcen tfoot, #eazpuahcen tr, #eazpuahcen td, #eazpuahcen th {
   border-style: none;
 }
 
-#tbvrsvfdoi p {
+#eazpuahcen p {
   margin: 0;
   padding: 0;
 }
 
-#tbvrsvfdoi .gt_table {
+#eazpuahcen .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
   margin-left: auto;
   margin-right: auto;
   color: #333333;
-  font-size: 16px;
+  font-size: 10px;
   font-weight: normal;
   font-style: normal;
   background-color: #FFFFFF;
@@ -118,12 +1279,12 @@ ul.task-list li input[type="checkbox"] {
   border-left-color: #D3D3D3;
 }
 
-#tbvrsvfdoi .gt_caption {
+#eazpuahcen .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#tbvrsvfdoi .gt_title {
+#eazpuahcen .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -135,7 +1296,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-width: 0;
 }
 
-#tbvrsvfdoi .gt_subtitle {
+#eazpuahcen .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -147,7 +1308,7 @@ ul.task-list li input[type="checkbox"] {
   border-top-width: 0;
 }
 
-#tbvrsvfdoi .gt_heading {
+#eazpuahcen .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -159,13 +1320,13 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#tbvrsvfdoi .gt_bottom_border {
+#eazpuahcen .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#tbvrsvfdoi .gt_col_headings {
+#eazpuahcen .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -180,7 +1341,7 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#tbvrsvfdoi .gt_col_heading {
+#eazpuahcen .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -200,7 +1361,7 @@ ul.task-list li input[type="checkbox"] {
   overflow-x: hidden;
 }
 
-#tbvrsvfdoi .gt_column_spanner_outer {
+#eazpuahcen .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -212,15 +1373,15 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 4px;
 }
 
-#tbvrsvfdoi .gt_column_spanner_outer:first-child {
+#eazpuahcen .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tbvrsvfdoi .gt_column_spanner_outer:last-child {
+#eazpuahcen .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tbvrsvfdoi .gt_column_spanner {
+#eazpuahcen .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -232,11 +1393,11 @@ ul.task-list li input[type="checkbox"] {
   width: 100%;
 }
 
-#tbvrsvfdoi .gt_spanner_row {
+#eazpuahcen .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#tbvrsvfdoi .gt_group_heading {
+#eazpuahcen .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -262,7 +1423,7 @@ ul.task-list li input[type="checkbox"] {
   text-align: left;
 }
 
-#tbvrsvfdoi .gt_empty_group_heading {
+#eazpuahcen .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -277,17 +1438,17 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 
-#tbvrsvfdoi .gt_from_md > :first-child {
+#eazpuahcen .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tbvrsvfdoi .gt_from_md > :last-child {
+#eazpuahcen .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tbvrsvfdoi .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
+#eazpuahcen .gt_row {
+  padding-top: 1px;
+  padding-bottom: 1px;
   padding-left: 5px;
   padding-right: 5px;
   margin: 10px;
@@ -304,7 +1465,7 @@ ul.task-list li input[type="checkbox"] {
   overflow-x: hidden;
 }
 
-#tbvrsvfdoi .gt_stub {
+#eazpuahcen .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -317,592 +1478,7 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#tbvrsvfdoi .gt_stub_row_group {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-  vertical-align: top;
-}
-
-#tbvrsvfdoi .gt_row_group_first td {
-  border-top-width: 2px;
-}
-
-#tbvrsvfdoi .gt_row_group_first th {
-  border-top-width: 2px;
-}
-
-#tbvrsvfdoi .gt_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#tbvrsvfdoi .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-color: #D3D3D3;
-}
-
-#tbvrsvfdoi .gt_first_summary_row.thick {
-  border-top-width: 2px;
-}
-
-#tbvrsvfdoi .gt_last_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#tbvrsvfdoi .gt_grand_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#tbvrsvfdoi .gt_first_grand_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #D3D3D3;
-}
-
-#tbvrsvfdoi .gt_last_grand_summary_row_top {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: double;
-  border-bottom-width: 6px;
-  border-bottom-color: #D3D3D3;
-}
-
-#tbvrsvfdoi .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
-#tbvrsvfdoi .gt_table_body {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#tbvrsvfdoi .gt_footnotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#tbvrsvfdoi .gt_footnote {
-  margin: 0px;
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#tbvrsvfdoi .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#tbvrsvfdoi .gt_sourcenote {
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#tbvrsvfdoi .gt_left {
-  text-align: left;
-}
-
-#tbvrsvfdoi .gt_center {
-  text-align: center;
-}
-
-#tbvrsvfdoi .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#tbvrsvfdoi .gt_font_normal {
-  font-weight: normal;
-}
-
-#tbvrsvfdoi .gt_font_bold {
-  font-weight: bold;
-}
-
-#tbvrsvfdoi .gt_font_italic {
-  font-style: italic;
-}
-
-#tbvrsvfdoi .gt_super {
-  font-size: 65%;
-}
-
-#tbvrsvfdoi .gt_footnote_marks {
-  font-size: 75%;
-  vertical-align: 0.4em;
-  position: initial;
-}
-
-#tbvrsvfdoi .gt_asterisk {
-  font-size: 100%;
-  vertical-align: 0;
-}
-
-#tbvrsvfdoi .gt_indent_1 {
-  text-indent: 5px;
-}
-
-#tbvrsvfdoi .gt_indent_2 {
-  text-indent: 10px;
-}
-
-#tbvrsvfdoi .gt_indent_3 {
-  text-indent: 15px;
-}
-
-#tbvrsvfdoi .gt_indent_4 {
-  text-indent: 20px;
-}
-
-#tbvrsvfdoi .gt_indent_5 {
-  text-indent: 25px;
-}
-
-#tbvrsvfdoi .katex-display {
-  display: inline-flex !important;
-  margin-bottom: 0.75em !important;
-}
-
-#tbvrsvfdoi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
-  height: 0px !important;
-}
-</style>
-
-<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<thead>
-<tr class="gt_col_headings header">
-<th id="practice" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">practice</th>
-<th id="prac_name" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">prac_name</th>
-<th id="sicbl" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">sicbl</th>
-<th id="name" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">name</th>
-<th id="regional_team_id" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">regional_team_id</th>
-<th id="region" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">region</th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-<tr class="odd">
-<td class="gt_row gt_left" headers="practice">A89603</td>
-<td class="gt_row gt_left" headers="prac_name">NA</td>
-<td class="gt_row gt_left" headers="sicbl">NA</td>
-<td class="gt_row gt_left" headers="name">NA</td>
-<td class="gt_row gt_left" headers="regional_team_id">NA</td>
-<td class="gt_row gt_left" headers="region">NA</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="practice">D83036</td>
-<td class="gt_row gt_left" headers="prac_name">CHURCH FARM SURGERY</td>
-<td class="gt_row gt_left" headers="sicbl">06L</td>
-<td class="gt_row gt_left" headers="name">NHS IPSWICH AND EAST SUFFOLK</td>
-<td class="gt_row gt_left" headers="regional_team_id">Y61</td>
-<td class="gt_row gt_left" headers="region">East of England</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="practice">F81127</td>
-<td class="gt_row gt_left" headers="prac_name">NA</td>
-<td class="gt_row gt_left" headers="sicbl">NA</td>
-<td class="gt_row gt_left" headers="name">NA</td>
-<td class="gt_row gt_left" headers="regional_team_id">NA</td>
-<td class="gt_row gt_left" headers="region">NA</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="practice">F81195</td>
-<td class="gt_row gt_left" headers="prac_name">NA</td>
-<td class="gt_row gt_left" headers="sicbl">NA</td>
-<td class="gt_row gt_left" headers="name">NA</td>
-<td class="gt_row gt_left" headers="regional_team_id">NA</td>
-<td class="gt_row gt_left" headers="region">NA</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="practice">L83125</td>
-<td class="gt_row gt_left" headers="prac_name">BARTON SURGERY</td>
-<td class="gt_row gt_left" headers="sicbl">15N</td>
-<td class="gt_row gt_left" headers="name">NHS DEVON</td>
-<td class="gt_row gt_left" headers="regional_team_id">Y58</td>
-<td class="gt_row gt_left" headers="region">South West</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="practice">P81756</td>
-<td class="gt_row gt_left" headers="prac_name">DANEHOUSE MEDICAL PRACTICE</td>
-<td class="gt_row gt_left" headers="sicbl">01A</td>
-<td class="gt_row gt_left" headers="name">NHS EAST LANCASHIRE</td>
-<td class="gt_row gt_left" headers="regional_team_id">Y62</td>
-<td class="gt_row gt_left" headers="region">North West</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="practice">P84682</td>
-<td class="gt_row gt_left" headers="prac_name">NA</td>
-<td class="gt_row gt_left" headers="sicbl">NA</td>
-<td class="gt_row gt_left" headers="name">NA</td>
-<td class="gt_row gt_left" headers="regional_team_id">NA</td>
-<td class="gt_row gt_left" headers="region">NA</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="practice">Y02128</td>
-<td class="gt_row gt_left" headers="prac_name">NA</td>
-<td class="gt_row gt_left" headers="sicbl">NA</td>
-<td class="gt_row gt_left" headers="name">NA</td>
-<td class="gt_row gt_left" headers="regional_team_id">NA</td>
-<td class="gt_row gt_left" headers="region">NA</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="practice">Y05279</td>
-<td class="gt_row gt_left" headers="prac_name">NA</td>
-<td class="gt_row gt_left" headers="sicbl">NA</td>
-<td class="gt_row gt_left" headers="name">NA</td>
-<td class="gt_row gt_left" headers="regional_team_id">NA</td>
-<td class="gt_row gt_left" headers="region">NA</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="practice">Y05412</td>
-<td class="gt_row gt_left" headers="prac_name">SOUTH WIGSTON ASYLUM SERVICE</td>
-<td class="gt_row gt_left" headers="sicbl">03W</td>
-<td class="gt_row gt_left" headers="name">NHS EAST LEICESTERSHIRE AND RUTLAND</td>
-<td class="gt_row gt_left" headers="regional_team_id">Y60</td>
-<td class="gt_row gt_left" headers="region">Midlands</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="practice">Y07819</td>
-<td class="gt_row gt_left" headers="prac_name">SPCL SURGERY</td>
-<td class="gt_row gt_left" headers="sicbl">D9Y0V</td>
-<td class="gt_row gt_left" headers="name">NHS HAMPSHIRE, SOUTHAMPTON AND ISLE OF WIGHT</td>
-<td class="gt_row gt_left" headers="regional_team_id">Y59</td>
-<td class="gt_row gt_left" headers="region">South East</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="practice">Y08082</td>
-<td class="gt_row gt_left" headers="prac_name">BASSETLAW SAS PRACTICE</td>
-<td class="gt_row gt_left" headers="sicbl">02Q</td>
-<td class="gt_row gt_left" headers="name">NHS BASSETLAW</td>
-<td class="gt_row gt_left" headers="regional_team_id">Y60</td>
-<td class="gt_row gt_left" headers="region">Midlands</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="practice">Y08368</td>
-<td class="gt_row gt_left" headers="prac_name">NA</td>
-<td class="gt_row gt_left" headers="sicbl">NA</td>
-<td class="gt_row gt_left" headers="name">NA</td>
-<td class="gt_row gt_left" headers="regional_team_id">NA</td>
-<td class="gt_row gt_left" headers="region">NA</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-</section>
-<section id="practices-contributing-to-all-months." class="level2">
-<h2 class="anchored" data-anchor-id="practices-contributing-to-all-months.">Practices contributing to all months.</h2>
-<p>`</p>
-<p>6,167 of 6,858 practices prescribed atorvastatin throughout the study period. 691 practices will be lost by restricting to practices which prescribe every month of the study.</p>
-<p>TODO: Look at list size of dropped practices</p>
-</section>
-<section id="missing-sub-icb-locations" class="level2">
-<h2 class="anchored" data-anchor-id="missing-sub-icb-locations">Missing Sub ICB Locations</h2>
-<p>The list size, Sub ICB Location, and practice name come from the <code>practice_statistics</code> table. This table does not include information for all of the practices.</p>
-<p>There are 399 practices missing from the <code>practice_statistics</code> table, contributing 4,415 months of data. Practices are missing across all regions.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div id="dizchzxijv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#dizchzxijv table {
-  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#dizchzxijv thead, #dizchzxijv tbody, #dizchzxijv tfoot, #dizchzxijv tr, #dizchzxijv td, #dizchzxijv th {
-  border-style: none;
-}
-
-#dizchzxijv p {
-  margin: 0;
-  padding: 0;
-}
-
-#dizchzxijv .gt_table {
-  display: table;
-  border-collapse: collapse;
-  line-height: normal;
-  margin-left: auto;
-  margin-right: auto;
-  color: #333333;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  background-color: #FFFFFF;
-  width: auto;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-}
-
-#dizchzxijv .gt_caption {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#dizchzxijv .gt_title {
-  color: #333333;
-  font-size: 125%;
-  font-weight: initial;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#dizchzxijv .gt_subtitle {
-  color: #333333;
-  font-size: 85%;
-  font-weight: initial;
-  padding-top: 3px;
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#dizchzxijv .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#dizchzxijv .gt_bottom_border {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#dizchzxijv .gt_col_headings {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#dizchzxijv .gt_col_heading {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow-x: hidden;
-}
-
-#dizchzxijv .gt_column_spanner_outer {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-#dizchzxijv .gt_column_spanner_outer:first-child {
-  padding-left: 0;
-}
-
-#dizchzxijv .gt_column_spanner_outer:last-child {
-  padding-right: 0;
-}
-
-#dizchzxijv .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow-x: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-#dizchzxijv .gt_spanner_row {
-  border-bottom-style: hidden;
-}
-
-#dizchzxijv .gt_group_heading {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  text-align: left;
-}
-
-#dizchzxijv .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#dizchzxijv .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#dizchzxijv .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#dizchzxijv .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin: 10px;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  overflow-x: hidden;
-}
-
-#dizchzxijv .gt_stub {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#dizchzxijv .gt_stub_row_group {
+#eazpuahcen .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -916,15 +1492,15 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: top;
 }
 
-#dizchzxijv .gt_row_group_first td {
+#eazpuahcen .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#dizchzxijv .gt_row_group_first th {
+#eazpuahcen .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#dizchzxijv .gt_summary_row {
+#eazpuahcen .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -934,16 +1510,16 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#dizchzxijv .gt_first_summary_row {
+#eazpuahcen .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#dizchzxijv .gt_first_summary_row.thick {
+#eazpuahcen .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#dizchzxijv .gt_last_summary_row {
+#eazpuahcen .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -953,7 +1529,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#dizchzxijv .gt_grand_summary_row {
+#eazpuahcen .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -963,7 +1539,7 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#dizchzxijv .gt_first_grand_summary_row {
+#eazpuahcen .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -973,7 +1549,7 @@ ul.task-list li input[type="checkbox"] {
   border-top-color: #D3D3D3;
 }
 
-#dizchzxijv .gt_last_grand_summary_row_top {
+#eazpuahcen .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -983,11 +1559,11 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#dizchzxijv .gt_striped {
+#eazpuahcen .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#dizchzxijv .gt_table_body {
+#eazpuahcen .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -996,7 +1572,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#dizchzxijv .gt_footnotes {
+#eazpuahcen .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1010,7 +1586,7 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#dizchzxijv .gt_footnote {
+#eazpuahcen .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1019,7 +1595,7 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#dizchzxijv .gt_sourcenotes {
+#eazpuahcen .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1033,7 +1609,7 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#dizchzxijv .gt_sourcenote {
+#eazpuahcen .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1041,72 +1617,72 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#dizchzxijv .gt_left {
+#eazpuahcen .gt_left {
   text-align: left;
 }
 
-#dizchzxijv .gt_center {
+#eazpuahcen .gt_center {
   text-align: center;
 }
 
-#dizchzxijv .gt_right {
+#eazpuahcen .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#dizchzxijv .gt_font_normal {
+#eazpuahcen .gt_font_normal {
   font-weight: normal;
 }
 
-#dizchzxijv .gt_font_bold {
+#eazpuahcen .gt_font_bold {
   font-weight: bold;
 }
 
-#dizchzxijv .gt_font_italic {
+#eazpuahcen .gt_font_italic {
   font-style: italic;
 }
 
-#dizchzxijv .gt_super {
+#eazpuahcen .gt_super {
   font-size: 65%;
 }
 
-#dizchzxijv .gt_footnote_marks {
+#eazpuahcen .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#dizchzxijv .gt_asterisk {
+#eazpuahcen .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#dizchzxijv .gt_indent_1 {
+#eazpuahcen .gt_indent_1 {
   text-indent: 5px;
 }
 
-#dizchzxijv .gt_indent_2 {
+#eazpuahcen .gt_indent_2 {
   text-indent: 10px;
 }
 
-#dizchzxijv .gt_indent_3 {
+#eazpuahcen .gt_indent_3 {
   text-indent: 15px;
 }
 
-#dizchzxijv .gt_indent_4 {
+#eazpuahcen .gt_indent_4 {
   text-indent: 20px;
 }
 
-#dizchzxijv .gt_indent_5 {
+#eazpuahcen .gt_indent_5 {
   text-indent: 25px;
 }
 
-#dizchzxijv .katex-display {
+#eazpuahcen .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#dizchzxijv div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#eazpuahcen div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1114,42 +1690,118 @@ ul.task-list li input[type="checkbox"] {
 <table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_col_headings header">
-<th id="region" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">region</th>
-<th id="n" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">n</th>
+<th id="practice" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">practice</th>
+<th id="prac_name" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">prac_name</th>
+<th id="sicbl" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">sicbl</th>
+<th id="name" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">name</th>
+<th id="regional_team_id" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">regional_team_id</th>
+<th id="region" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">region</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr class="odd">
-<td class="gt_row gt_left" headers="region">East of England</td>
-<td class="gt_row gt_right" headers="n">45</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">A89603</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="region">London</td>
-<td class="gt_row gt_right" headers="n">46</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">D83036</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">CHURCH FARM SURGERY</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">06L</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS IPSWICH AND EAST SUFFOLK</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y61</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">East of England</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="region">Midlands</td>
-<td class="gt_row gt_right" headers="n">69</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">F81127</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="region">North East and Yorkshire</td>
-<td class="gt_row gt_right" headers="n">76</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">F81195</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="region">North West</td>
-<td class="gt_row gt_right" headers="n">54</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">L83125</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">BARTON SURGERY</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">15N</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DEVON</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y58</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">South West</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="region">South East</td>
-<td class="gt_row gt_right" headers="n">70</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">P81756</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">DANEHOUSE MEDICAL PRACTICE</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">01A</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS EAST LANCASHIRE</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y62</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">North West</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="region">South West</td>
-<td class="gt_row gt_right" headers="n">38</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">P84682</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="region">NA</td>
-<td class="gt_row gt_right" headers="n">1</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y02128</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y05279</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y05412</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">SOUTH WIGSTON ASYLUM SERVICE</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">03W</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS EAST LEICESTERSHIRE AND RUTLAND</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y60</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y07819</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">SPCL SURGERY</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">D9Y0V</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS HAMPSHIRE, SOUTHAMPTON AND ISLE OF WIGHT</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y59</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">South East</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y08082</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">BASSETLAW SAS PRACTICE</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">02Q</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS BASSETLAW</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y60</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Y08368</td>
+<td class="gt_row gt_left" headers="prac_name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="sicbl" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="name" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="regional_team_id" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
+<td class="gt_row gt_left" headers="region" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">-</td>
 </tr>
 </tbody>
 </table>
@@ -1158,15 +1810,15 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </section>
-<section id="compare-region-and-practice-tables" class="level1">
-<h1>Compare region and practice tables</h1>
+<section id="compare-region-and-practice-tables" class="level2">
+<h2 class="anchored" data-anchor-id="compare-region-and-practice-tables">Compare region and practice tables</h2>
 </section>
-<section id="changing-region" class="level1">
-<h1>Changing region</h1>
+<section id="changing-region" class="level2">
+<h2 class="anchored" data-anchor-id="changing-region">Changing region</h2>
 <section id="sicbl-changing-regions" class="level3">
 <h3 class="anchored" data-anchor-id="sicbl-changing-regions">SICBL changing regions</h3>
 <p>Sub-ICB locations (SICBL) can be identified via 2 different columns in the <code>practice_statistics</code> dataset. <code>ccg_id</code> (renamed <code>sicbl</code> in this dataset) is static and shows the SICBL as of (??Date??). <code>stp_id</code> shows the SICBL as it was at the time. Using the <code>stp_id</code>.</p>
-<p>The difference in population between the <code>pct_id</code> and <code>ccg_id</code> definition of SICBL can be seen when plotting the list size per mont for each region. In the <code>pct_id</code> plot there is a dip in list size in the North West in June 2022, corresponding to a rise in Midlands.</p>
+<p>The difference in population between the <code>pct_id</code> and <code>ccg_id</code> definition of SICBL can be seen when plotting the list size per month for each region. In the <code>pct_id</code> plot there is a dip in list size in the North West in June 2022, corresponding to a rise in Midlands.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -1189,34 +1841,34 @@ ul.task-list li input[type="checkbox"] {
 <p>Practices from 2 SICBL change region during the study period.</p>
 </section>
 <section id="practices-changing-region" class="level3">
-<h3 class="anchored" data-anchor-id="practices-changing-region">practices changing region</h3>
-<p>There were 6 practices, from 4 Integrated Care Boards (ICB), which changed region during the study period.</p>
+<h3 class="anchored" data-anchor-id="practices-changing-region">Practices changing region</h3>
+<p>There were 6 practices, from 2 Integrated Care Boards (ICB), which changed region during the study period.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div id="swagkwbbzj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#swagkwbbzj table {
+<div id="pcrsmymyfj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#pcrsmymyfj table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#swagkwbbzj thead, #swagkwbbzj tbody, #swagkwbbzj tfoot, #swagkwbbzj tr, #swagkwbbzj td, #swagkwbbzj th {
+#pcrsmymyfj thead, #pcrsmymyfj tbody, #pcrsmymyfj tfoot, #pcrsmymyfj tr, #pcrsmymyfj td, #pcrsmymyfj th {
   border-style: none;
 }
 
-#swagkwbbzj p {
+#pcrsmymyfj p {
   margin: 0;
   padding: 0;
 }
 
-#swagkwbbzj .gt_table {
+#pcrsmymyfj .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
   margin-left: auto;
   margin-right: auto;
   color: #333333;
-  font-size: 16px;
+  font-size: 10px;
   font-weight: normal;
   font-style: normal;
   background-color: #FFFFFF;
@@ -1235,12 +1887,12 @@ ul.task-list li input[type="checkbox"] {
   border-left-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_caption {
+#pcrsmymyfj .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#swagkwbbzj .gt_title {
+#pcrsmymyfj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1252,7 +1904,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-width: 0;
 }
 
-#swagkwbbzj .gt_subtitle {
+#pcrsmymyfj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1264,7 +1916,7 @@ ul.task-list li input[type="checkbox"] {
   border-top-width: 0;
 }
 
-#swagkwbbzj .gt_heading {
+#pcrsmymyfj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1276,13 +1928,13 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_bottom_border {
+#pcrsmymyfj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_col_headings {
+#pcrsmymyfj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1297,7 +1949,7 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_col_heading {
+#pcrsmymyfj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1317,7 +1969,7 @@ ul.task-list li input[type="checkbox"] {
   overflow-x: hidden;
 }
 
-#swagkwbbzj .gt_column_spanner_outer {
+#pcrsmymyfj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1329,15 +1981,15 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 4px;
 }
 
-#swagkwbbzj .gt_column_spanner_outer:first-child {
+#pcrsmymyfj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#swagkwbbzj .gt_column_spanner_outer:last-child {
+#pcrsmymyfj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#swagkwbbzj .gt_column_spanner {
+#pcrsmymyfj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1349,11 +2001,11 @@ ul.task-list li input[type="checkbox"] {
   width: 100%;
 }
 
-#swagkwbbzj .gt_spanner_row {
+#pcrsmymyfj .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#swagkwbbzj .gt_group_heading {
+#pcrsmymyfj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1379,7 +2031,7 @@ ul.task-list li input[type="checkbox"] {
   text-align: left;
 }
 
-#swagkwbbzj .gt_empty_group_heading {
+#pcrsmymyfj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1394,17 +2046,17 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 
-#swagkwbbzj .gt_from_md > :first-child {
+#pcrsmymyfj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#swagkwbbzj .gt_from_md > :last-child {
+#pcrsmymyfj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#swagkwbbzj .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
+#pcrsmymyfj .gt_row {
+  padding-top: 1px;
+  padding-bottom: 1px;
   padding-left: 5px;
   padding-right: 5px;
   margin: 10px;
@@ -1421,7 +2073,7 @@ ul.task-list li input[type="checkbox"] {
   overflow-x: hidden;
 }
 
-#swagkwbbzj .gt_stub {
+#pcrsmymyfj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1434,7 +2086,7 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#swagkwbbzj .gt_stub_row_group {
+#pcrsmymyfj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1448,15 +2100,15 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: top;
 }
 
-#swagkwbbzj .gt_row_group_first td {
+#pcrsmymyfj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#swagkwbbzj .gt_row_group_first th {
+#pcrsmymyfj .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#swagkwbbzj .gt_summary_row {
+#pcrsmymyfj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1466,16 +2118,16 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#swagkwbbzj .gt_first_summary_row {
+#pcrsmymyfj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_first_summary_row.thick {
+#pcrsmymyfj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#swagkwbbzj .gt_last_summary_row {
+#pcrsmymyfj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1485,7 +2137,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_grand_summary_row {
+#pcrsmymyfj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1495,7 +2147,7 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#swagkwbbzj .gt_first_grand_summary_row {
+#pcrsmymyfj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1505,7 +2157,7 @@ ul.task-list li input[type="checkbox"] {
   border-top-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_last_grand_summary_row_top {
+#pcrsmymyfj .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1515,11 +2167,11 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_striped {
+#pcrsmymyfj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#swagkwbbzj .gt_table_body {
+#pcrsmymyfj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1528,7 +2180,7 @@ ul.task-list li input[type="checkbox"] {
   border-bottom-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_footnotes {
+#pcrsmymyfj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1542,7 +2194,7 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_footnote {
+#pcrsmymyfj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1551,7 +2203,7 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#swagkwbbzj .gt_sourcenotes {
+#pcrsmymyfj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1565,7 +2217,7 @@ ul.task-list li input[type="checkbox"] {
   border-right-color: #D3D3D3;
 }
 
-#swagkwbbzj .gt_sourcenote {
+#pcrsmymyfj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1573,72 +2225,72 @@ ul.task-list li input[type="checkbox"] {
   padding-right: 5px;
 }
 
-#swagkwbbzj .gt_left {
+#pcrsmymyfj .gt_left {
   text-align: left;
 }
 
-#swagkwbbzj .gt_center {
+#pcrsmymyfj .gt_center {
   text-align: center;
 }
 
-#swagkwbbzj .gt_right {
+#pcrsmymyfj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#swagkwbbzj .gt_font_normal {
+#pcrsmymyfj .gt_font_normal {
   font-weight: normal;
 }
 
-#swagkwbbzj .gt_font_bold {
+#pcrsmymyfj .gt_font_bold {
   font-weight: bold;
 }
 
-#swagkwbbzj .gt_font_italic {
+#pcrsmymyfj .gt_font_italic {
   font-style: italic;
 }
 
-#swagkwbbzj .gt_super {
+#pcrsmymyfj .gt_super {
   font-size: 65%;
 }
 
-#swagkwbbzj .gt_footnote_marks {
+#pcrsmymyfj .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#swagkwbbzj .gt_asterisk {
+#pcrsmymyfj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#swagkwbbzj .gt_indent_1 {
+#pcrsmymyfj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#swagkwbbzj .gt_indent_2 {
+#pcrsmymyfj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#swagkwbbzj .gt_indent_3 {
+#pcrsmymyfj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#swagkwbbzj .gt_indent_4 {
+#pcrsmymyfj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#swagkwbbzj .gt_indent_5 {
+#pcrsmymyfj .gt_indent_5 {
   text-indent: 25px;
 }
 
-#swagkwbbzj .katex-display {
+#pcrsmymyfj .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#swagkwbbzj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#pcrsmymyfj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1658,7 +2310,7 @@ ul.task-list li input[type="checkbox"] {
 </colgroup>
 <thead>
 <tr class="gt_col_headings gt_spanner_row header">
-<th rowspan="2" id="practice" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">practice</th>
+<th rowspan="2" id="practice" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">practice</th>
 <th colspan="2" id="Region" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
 Region
 </div></th>
@@ -1671,91 +2323,91 @@ SICBL
 <th colspan="2" id="SICBL code" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
 SICBL code
 </div></th>
-<th rowspan="2" id="month_From" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Date of change</th>
+<th rowspan="2" id="month_From" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">Date of change</th>
 </tr>
 <tr class="gt_col_headings even">
-<th id="region_From" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">from</th>
-<th id="region_To" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">to</th>
-<th id="name_From" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">from</th>
-<th id="name_To" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">to</th>
-<th id="sicbl_name_From" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">from</th>
-<th id="sicbl_name_To" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">to</th>
-<th id="pct_id_From" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">from</th>
-<th id="pct_id_To" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">to</th>
+<th id="region_From" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">from</th>
+<th id="region_To" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">to</th>
+<th id="name_From" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">from</th>
+<th id="name_To" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">to</th>
+<th id="sicbl_name_From" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">from</th>
+<th id="sicbl_name_To" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">to</th>
+<th id="pct_id_From" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">from</th>
+<th id="pct_id_To" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black" scope="col">to</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr class="odd">
-<td class="gt_row gt_left" headers="practice">C81077</td>
-<td class="gt_row gt_left" headers="region_From">North West</td>
-<td class="gt_row gt_left" headers="region_To">Midlands</td>
-<td class="gt_row gt_left" headers="name_From">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="name_To">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="sicbl_name_From">NHS TAMESIDE AND GLOSSOP</td>
-<td class="gt_row gt_left" headers="sicbl_name_To">NHS DERBY AND DERBYSHIRE</td>
-<td class="gt_row gt_left" headers="pct_id_From">01Y</td>
-<td class="gt_row gt_left" headers="pct_id_To">15M</td>
-<td class="gt_row gt_right" headers="month_From">2022-06-01</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">C81077</td>
+<td class="gt_row gt_left" headers="region_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">North West</td>
+<td class="gt_row gt_left" headers="region_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+<td class="gt_row gt_left" headers="name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="sicbl_name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS TAMESIDE AND GLOSSOP</td>
+<td class="gt_row gt_left" headers="sicbl_name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE</td>
+<td class="gt_row gt_left" headers="pct_id_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">01Y</td>
+<td class="gt_row gt_left" headers="pct_id_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">15M</td>
+<td class="gt_row gt_right" headers="month_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">2022-06-01</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="practice">C81081</td>
-<td class="gt_row gt_left" headers="region_From">North West</td>
-<td class="gt_row gt_left" headers="region_To">Midlands</td>
-<td class="gt_row gt_left" headers="name_From">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="name_To">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="sicbl_name_From">NHS TAMESIDE AND GLOSSOP</td>
-<td class="gt_row gt_left" headers="sicbl_name_To">NHS DERBY AND DERBYSHIRE</td>
-<td class="gt_row gt_left" headers="pct_id_From">01Y</td>
-<td class="gt_row gt_left" headers="pct_id_To">15M</td>
-<td class="gt_row gt_right" headers="month_From">2022-06-01</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">C81081</td>
+<td class="gt_row gt_left" headers="region_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">North West</td>
+<td class="gt_row gt_left" headers="region_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+<td class="gt_row gt_left" headers="name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="sicbl_name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS TAMESIDE AND GLOSSOP</td>
+<td class="gt_row gt_left" headers="sicbl_name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE</td>
+<td class="gt_row gt_left" headers="pct_id_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">01Y</td>
+<td class="gt_row gt_left" headers="pct_id_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">15M</td>
+<td class="gt_row gt_right" headers="month_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">2022-06-01</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="practice">C81106</td>
-<td class="gt_row gt_left" headers="region_From">North West</td>
-<td class="gt_row gt_left" headers="region_To">Midlands</td>
-<td class="gt_row gt_left" headers="name_From">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="name_To">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="sicbl_name_From">NHS TAMESIDE AND GLOSSOP</td>
-<td class="gt_row gt_left" headers="sicbl_name_To">NHS DERBY AND DERBYSHIRE</td>
-<td class="gt_row gt_left" headers="pct_id_From">01Y</td>
-<td class="gt_row gt_left" headers="pct_id_To">15M</td>
-<td class="gt_row gt_right" headers="month_From">2022-06-01</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">C81106</td>
+<td class="gt_row gt_left" headers="region_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">North West</td>
+<td class="gt_row gt_left" headers="region_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+<td class="gt_row gt_left" headers="name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="sicbl_name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS TAMESIDE AND GLOSSOP</td>
+<td class="gt_row gt_left" headers="sicbl_name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE</td>
+<td class="gt_row gt_left" headers="pct_id_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">01Y</td>
+<td class="gt_row gt_left" headers="pct_id_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">15M</td>
+<td class="gt_row gt_right" headers="month_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">2022-06-01</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="practice">C81615</td>
-<td class="gt_row gt_left" headers="region_From">North West</td>
-<td class="gt_row gt_left" headers="region_To">Midlands</td>
-<td class="gt_row gt_left" headers="name_From">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="name_To">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="sicbl_name_From">NHS TAMESIDE AND GLOSSOP</td>
-<td class="gt_row gt_left" headers="sicbl_name_To">NHS DERBY AND DERBYSHIRE</td>
-<td class="gt_row gt_left" headers="pct_id_From">01Y</td>
-<td class="gt_row gt_left" headers="pct_id_To">15M</td>
-<td class="gt_row gt_right" headers="month_From">2022-06-01</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">C81615</td>
+<td class="gt_row gt_left" headers="region_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">North West</td>
+<td class="gt_row gt_left" headers="region_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+<td class="gt_row gt_left" headers="name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="sicbl_name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS TAMESIDE AND GLOSSOP</td>
+<td class="gt_row gt_left" headers="sicbl_name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE</td>
+<td class="gt_row gt_left" headers="pct_id_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">01Y</td>
+<td class="gt_row gt_left" headers="pct_id_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">15M</td>
+<td class="gt_row gt_right" headers="month_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">2022-06-01</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="practice">C81640</td>
-<td class="gt_row gt_left" headers="region_From">North West</td>
-<td class="gt_row gt_left" headers="region_To">Midlands</td>
-<td class="gt_row gt_left" headers="name_From">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="name_To">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="sicbl_name_From">NHS TAMESIDE AND GLOSSOP</td>
-<td class="gt_row gt_left" headers="sicbl_name_To">NHS DERBY AND DERBYSHIRE</td>
-<td class="gt_row gt_left" headers="pct_id_From">01Y</td>
-<td class="gt_row gt_left" headers="pct_id_To">15M</td>
-<td class="gt_row gt_right" headers="month_From">2022-06-01</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">C81640</td>
+<td class="gt_row gt_left" headers="region_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">North West</td>
+<td class="gt_row gt_left" headers="region_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+<td class="gt_row gt_left" headers="name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS GREATER MANCHESTER INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="sicbl_name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS TAMESIDE AND GLOSSOP</td>
+<td class="gt_row gt_left" headers="sicbl_name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS DERBY AND DERBYSHIRE</td>
+<td class="gt_row gt_left" headers="pct_id_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">01Y</td>
+<td class="gt_row gt_left" headers="pct_id_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">15M</td>
+<td class="gt_row gt_right" headers="month_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">2022-06-01</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="practice">K83023</td>
-<td class="gt_row gt_left" headers="region_From">East of England</td>
-<td class="gt_row gt_left" headers="region_To">Midlands</td>
-<td class="gt_row gt_left" headers="name_From">NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="name_To">NHS NORTHAMPTONSHIRE INTEGRATED CARE BOARD</td>
-<td class="gt_row gt_left" headers="sicbl_name_From">NHS CAMBRIDGESHIRE AND PETERBOROUGH</td>
-<td class="gt_row gt_left" headers="sicbl_name_To">NHS NORTHAMPTONSHIRE</td>
-<td class="gt_row gt_left" headers="pct_id_From">06H</td>
-<td class="gt_row gt_left" headers="pct_id_To">78H</td>
-<td class="gt_row gt_right" headers="month_From">2022-06-01</td>
+<td class="gt_row gt_left" headers="practice" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">K83023</td>
+<td class="gt_row gt_left" headers="region_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">East of England</td>
+<td class="gt_row gt_left" headers="region_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">Midlands</td>
+<td class="gt_row gt_left" headers="name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS NORTHAMPTONSHIRE INTEGRATED CARE BOARD</td>
+<td class="gt_row gt_left" headers="sicbl_name_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS CAMBRIDGESHIRE AND PETERBOROUGH</td>
+<td class="gt_row gt_left" headers="sicbl_name_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">NHS NORTHAMPTONSHIRE</td>
+<td class="gt_row gt_left" headers="pct_id_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">06H</td>
+<td class="gt_row gt_left" headers="pct_id_To" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">78H</td>
+<td class="gt_row gt_right" headers="month_From" style="border-left-width: 1.5px; border-left-style: solid; border-left-color: black; border-right-width: 1.5px; border-right-style: solid; border-right-color: black; border-top-width: 1.5px; border-top-style: solid; border-top-color: black; border-bottom-width: 1.5px; border-bottom-style: solid; border-bottom-color: black">2022-06-01</td>
 </tr>
 </tbody>
 </table>
@@ -1810,9 +2462,10 @@ SICBL code
 </div>
 <p>Although the practices all had large changes in list size after the change in region this could be seen as a continuation of the pattern seen before the practice change.</p>
 </section>
+</section>
 <section id="missing-list-sizes" class="level2">
 <h2 class="anchored" data-anchor-id="missing-list-sizes">Missing list sizes</h2>
-<p>25,482 out of 338,179,583 (7.5350498^{-5}%) items were prescribed from a practice with no associated list size. There were 399 practices with prescriptions without an associated list size.</p>
+<p>25,716 out of 344,419,663 (0.0075%) items were prescribed from a practice with no associated list size. There were 402 practices with prescriptions without an associated list size.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -1843,7 +2496,7 @@ SICBL code
 </div>
 </div>
 </div>
-<p>Practice <code>Y07040</code> is Salisbury walk-in centre. As a walk in centre there is no fixed patient list. However, it is able to presribe atorvastatin.</p>
+<p>Practice <code>Y07040</code> is Salisbury walk-in centre. As a walk in centre there is no fixed patient list. However, it is able to prescribe atorvastatin.</p>
 <p>An example of a practice that has prescribing data with no list size for a period after it has both prescribing and list size can be seen in practice <code>L83642</code> below:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -1856,204 +2509,210 @@ SICBL code
 </div>
 <p>Practice <code>L83642</code> is Estover Surgery. Estover surgery closed, however, due to electronic repeat dispensing (eRD) atorvastatin may still be dispensed for 6-12 months after closing.</p>
 </section>
-</section>
 <section id="opening-practices" class="level1">
 <h1>“Opening” practices</h1>
 <p>I defined opening practices as practices with no atorvastatin prescribing at the start of the study period. There were 28 practices that opened during the study period. In order to investigate if there is any pattern to opening practices I plotted their list size per month.</p>
+<p>7 of these practices are SAS practices.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-1.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_sas-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-2.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_sas-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-3.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_sas-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-4.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_sas-4.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-5.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_sas-5.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-6.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_sas-6.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-7.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_sas-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>5 of these practices are specialist, urgent, asylum, pilot or nursing home practices.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_check_files/figure-html/miss_start_other_atypical-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-8.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_other_atypical-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-9.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_other_atypical-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-10.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_other_atypical-4.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-11.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_other_atypical-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The remaining 16 practices are correctly categorised as GP practices.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-12.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-13.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-14.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-4.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-15.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-5.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-16.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-6.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-17.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-7.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-18.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-8.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-19.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-9.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-20.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-10.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-21.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-11.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-22.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-12.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-23.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-13.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-24.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-14.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-25.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-15.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-26.png" class="img-fluid figure-img" width="2880"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-27.png" class="img-fluid figure-img" width="2880"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="data_check_files/figure-html/plot-miss-start-28.png" class="img-fluid figure-img" width="2880"></p>
+<p><img src="data_check_files/figure-html/miss_start_just_normal_practices-16.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2061,7 +2720,51 @@ SICBL code
 </section>
 <section id="closing-practices" class="level1">
 <h1>“Closing” practices</h1>
-<p>Similarly, I defined closing practices as practices with no atorvastatin prescribing at the end of the study period. There were 600 practices that opened during the study period. In order to investigate if there is any pattern to closing practices I plotted their list size per month. I have included a selection of these plots which are indicative of 4 differnet patterns.</p>
+<p>Similarly, I defined closing practices as practices with no atorvastatin prescribing at the end of the study period. There were 600 practices that opened during the study period. In order to investigate if there is any pattern to closing practices I plotted their list size per month.</p>
+<p>600 of the closing practices were typical.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_check_files/figure-html/miss_end_atypical-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_check_files/figure-html/miss_end_atypical-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_check_files/figure-html/miss_end_atypical-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_check_files/figure-html/miss_end_atypical-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_check_files/figure-html/miss_end_atypical-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>I have included a selection of the remaining plots which are indicative of 4 different patterns.</p>
+<p>A sharp decrease in list size before closing <img src="../output/data_check/atorvastatin/closing_practices/closing_practices_L85612.png" class="img-fluid" alt="sharp_decrease"></p>
+<p>Slow decrease in list size before closing <img src="../output/data_check/atorvastatin/closing_practices/closing_practices_C81028.png" class="img-fluid" alt="slow_decrease"></p>
+<p>A period of low list size before closing <img src="../output/data_check/atorvastatin/closing_practices/closing_practices_Y03051.png" class="img-fluid" alt="long_tail"></p>
+<p>No decrease in list size before closing <img src="../output/data_check/atorvastatin/closing_practices/closing_practices_G82671.png" class="img-fluid" alt="no_decrease"></p>
+<p>Activity after closing <img src="../output/data_check/atorvastatin/closing_practices/closing_practices_F86642.png" class="img-fluid" alt="activity_after_closing"></p>
 </section>
 
 </main>

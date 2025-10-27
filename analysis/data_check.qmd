@@ -3,8 +3,6 @@ title: "Open Prescribing Data Checks: Atorvastatin"
 format: html
 ---
 
-
-
 ## OpenPrescibing
 
 ```{r}
@@ -27,12 +25,57 @@ NHS Digital publishes monthly and annual prescribing datasets from the NHS Busin
 
 The data used here is downloaded from [**OpenPrescribing**](www.openprescibing.net) using BigQuery via the notebooks in the [notebook directory](https://github.com/andrewscolm/op_indicator_saturation/blob/master/notebooks).
 
-5 separate tables are queried. 
-- `ebmdatalab.hscic.normalised_prescribing`
-- `ebmdatalab.hscic.practices`
-- `hscic.practice_statistics`
-- `ebmdatalab.hscic.ccg` 
-- `hscic.bnf`
+5 tables are queried.
+
+-   `ebmdatalab.hscic.normalised_prescribing`
+
+    -   practice
+
+    -   month
+
+    -   regional_team
+
+    -   bnf_name
+
+    -   chemical
+
+    -   items
+
+    -   quantity
+
+-   `ebmdatalab.hscic.practices`
+
+    -   code
+
+    -   setting
+
+-   `hscic.practice_statistics`
+
+    -   month
+
+    -   total_list_size
+
+    -   pct_id
+
+    -   practice
+
+    -   name
+
+    -   ccg_id
+
+    -   pcn_id
+
+    -   status_code
+
+-   `ebmdatalab.hscic.ccg`
+
+    -   regional_team_id
+
+    -   code
+
+-   `hscic.bnf`
+
+    -   presentation_code
 
 Data is stored in the [data](https://github.com/andrewscolm/op_indicator_saturation/blob/master/data) folder.
 
@@ -43,6 +86,10 @@ Data is stored in the [data](https://github.com/andrewscolm/op_indicator_saturat
 source(here("analysis","design.R"))
 
 label_number_n <- label_number(1, 1, big.mark=",")
+label_perc_n <- label_percent(accuracy =.0001)
+
+
+df_stp <- read_csv(here::here(directory_name,"prac_stps.csv")) 
 
 ###  
 df_ccgs_prac <- read_csv(here::here(directory_name,"prac_ccgs.csv")) %>%
@@ -64,6 +111,245 @@ df_atorvastatin_prac <- read_csv(here::here(directory_name,"atorvastatin_practic
 df_regions <- read_csv(here::here("data","NHS_England_Names_and_Codes_in_England.csv")) %>%
   rename(regional_team = NHSER24CDH ,region = NHSER24NM) %>%
   select(regional_team,region)
+
+df_atorvastatin_prac_region <- df_atorvastatin_prac %>% 
+  left_join(df_stats_prac) %>%
+  mutate(month =as.Date(month)) %>% 
+  ungroup()
+
+```
+
+## Practices contributing to all months.
+
+```{r}
+#| label: all-month-filter
+#| include: false
+
+# count number of times each practice contributes 
+prac_count<-df_atorvastatin_prac %>% 
+    group_by(practice,month) %>% 
+    summarise(practice =last(practice)) %>%
+    count(practice) ## 6858
+
+atorvastatin_practices <- df_atorvastatin_prac %>%
+  group_by(practice) %>%
+  summarise(practice=last(practice)) 
+  
+    
+n_atorvastatin_practices <- atorvastatin_practices %>%
+  nrow()  ## 6858
+
+
+if( nrow(prac_count) != n_atorvastatin_practices){ print("Practice count does not match with above method")}
+
+# do we lose practices in the filter?
+prac_count_all_months<-prac_count %>% 
+    filter(n==68) # 6,164
+
+ id_dropped_count_all_months <- prac_count %>%
+  anti_join(prac_count_all_months %>% select(practice)) %>%
+  select(practice)
+
+dropped_count_all_months <- df_atorvastatin_prac_region %>% 
+  inner_join(id_dropped_count_all_months) 
+
+dropped_count_all_months_items <-  sum(dropped_count_all_months$items)
+  
+df_dropped_count_all_months_list_size <- dropped_count_all_months %>%
+  group_by(practice,month) %>%
+  summarise(total_list_size = mean(total_list_size ,na.rm = T)) %>%
+  group_by(practice) %>%
+  summarise(total_list_size = sum(total_list_size ,na.rm = T))
+
+dropped_count_all_months_list_size <-sum(df_dropped_count_all_months_list_size$total_list_size)
+
+```
+
+\`
+
+`{r} label_number_n(nrow(prac_count_all_months))` of `{r} label_number_n(nrow(prac_count))` practices prescribed atorvastatin throughout the study period. `{r} label_number_n(nrow(prac_count)-nrow(prac_count_all_months))` practices will be lost by restricting to practices which prescribe every month of the study. These practices contribute `{r} label_number_n(dropped_count_all_months_items)` prescribed items and a total list size of `{r} label_number_n(dropped_count_all_months_items)` throughout the study period.
+
+## Missing Sub ICB Locations
+
+The list size, Sub ICB Location, and practice name come from the `practice_statistics` table. This table does not include information for all of the practices.
+
+```{r}
+#| label: miss-sicbl
+#| echo: false
+#| warning: false
+
+### how many practices are missing sicbl code  
+miss_ccg <- df_atorvastatin_prac  %>% 
+  left_join(df_stats_prac) %>% 
+  filter(is.na(sicbl)) # 4,415 lines with missing sicbl
+
+miss_ccg_id <- miss_ccg %>%
+  group_by(practice) %>%
+  summarise(practice=last(practice)) #399 practices missing ccg (means missing list size)
+
+
+
+```
+
+There are `{r} label_number_n(nrow(miss_ccg_id))` practices missing from the `practice_statistics` table, contributing `{r} label_number_n(nrow(miss_ccg))` months of data. Practices are missing across all regions.
+
+```{r}
+#| label: table-miss-ccg-by-region
+#| echo: false
+#| warning: false
+miss_ccg_by_region <- miss_ccg %>%
+  group_by(practice) %>%
+  summarise(practice=last(practice),
+            regional_team=last(regional_team)) %>% #399 practices missing ccg (means missing list size)
+  left_join(df_regions) %>%
+  group_by(region) %>%
+  count() %>%
+  ungroup()
+
+if( sum(miss_ccg_by_region$n) != nrow(miss_ccg_id)){ print("Practice count does not match with above method")}
+
+gt(miss_ccg_by_region) %>%
+  tab_options(table.font.size = 10,
+  data_row.padding = px(1)) %>% 
+    tab_style(
+      style = cell_borders(
+      sides = "all",
+      color = "black",
+      weight = px(1.5),
+      style = "solid"
+    ),
+    locations = list(cells_body(), cells_column_labels())) 
+
+```
+
+## Practice Settings
+
+The `ebmdatalab.hscic.practices` table is used to restrict the datasets to GP settings. However, this does not always perfectly restrict to typical GP practices. Further work needs to be applied in order to identify atypical practices such as special allocation scheme, specialist, urgent, asylum, pilot or nursing home practices. I used the following terms to try to identify each practice type from the practice name:
+
+-   special allocation scheme practice
+    -   "SAS"
+    -   "Special Allocation"
+    -   "Select care"
+    -   "SPCL"
+-   specialist practice
+    -   "Specialist"
+-   urgent care
+    -   "urgent"
+-   asylum practice
+    -   asylum
+-   pilot practice
+    -   "Pilot"
+-   nursing home practice
+    -   "nurs"
+    -   "one care"
+-   Walk-in centres
+    -   "walk-"
+    -   "walk in"
+
+```{r}
+#| label: settings
+#| include: false
+
+setting_sas <- df_stats_prac %>%
+  mutate(name=str_to_lower(name)) %>%
+ filter(str_detect(name, 'sas|special allocation|select care|spcl')) %>%
+ group_by(practice, name) %>%
+ summarise(name = last(name),
+ type= "special allocation scheme")
+
+setting_specialist <- df_stats_prac %>%
+  mutate(name=str_to_lower(name)) %>%
+ filter(str_detect(name, 'specialist')) %>%
+ group_by(practice, name) %>%
+ summarise(name = last(name),
+ type= "specialist")
+
+setting_urgent <- df_stats_prac %>%
+  mutate(name=str_to_lower(name)) %>%
+ filter(str_detect(name, 'urgent')) %>%
+ group_by(practice, name) %>%
+ summarise(name = last(name),
+ type= "urgent care")
+
+setting_asylum <- df_stats_prac %>%
+  mutate(name=str_to_lower(name)) %>%
+ filter(str_detect(name, 'asylum')) %>%
+ group_by(practice, name) %>%
+ summarise(name = last(name),
+ type= "asylum")
+
+setting_pilot <- df_stats_prac %>%
+  mutate(name=str_to_lower(name)) %>%
+ filter(str_detect(name, 'pilot')) %>%
+ group_by(practice, name) %>%
+ summarise(name = last(name),
+ type= "pilot")
+
+setting_nursing <- df_stats_prac %>%
+  mutate(name=str_to_lower(name)) %>%
+ filter(str_detect(name, 'nurs|one care')) %>%
+ group_by(practice, name) %>%
+ summarise(name = last(name),
+ type= "nursing home")
+
+setting_walk <- df_stats_prac %>%
+  mutate(name=str_to_lower(name)) %>%
+ filter(str_detect(name, 'walk-|walk in')) %>%
+ group_by(practice, name) %>%
+ summarise(name = last(name),
+ type= "walk-in")
+
+### get highest total_list_size
+high_list_size <- df_stats_prac %>%
+ group_by(name) %>%
+ summarise(name =str_to_lower(last(name)),
+ highest_list_size = max(total_list_size ,na.rm = T))
+
+df_setting <- setting_sas %>%
+  bind_rows(setting_specialist) %>%
+  bind_rows(setting_urgent) %>%
+  bind_rows(setting_asylum) %>%
+  bind_rows(setting_pilot) %>%
+  bind_rows(setting_nursing) %>%
+  bind_rows(setting_walk) %>%
+  left_join(high_list_size) %>% 
+  ungroup()
+
+
+
+```
+
+In total, we identified `{r} nrow(df_setting)` atypical practices. This comprised `{r} nrow(setting_sas)` special allocation scheme practices, `{r} nrow(setting_specialist)` specialist scheme practice,`{r} nrow(setting_urgent)` urgent care practice, `{r} nrow(setting_asylum)` asylum practice, `{r} nrow(setting_pilot)` pilot scheme practice and `{r} nrow(setting_nursing)` nursing home practice. Filtering practices by a minimum list size is sometimes used to remove these atypical practices. The following table contains the maximum list size of each identified atypical practice during the study period.
+
+```{r}
+#| label: table_settings
+#| echo: false
+#| warning: false
+
+
+
+df_setting %>%
+  gt() %>%
+  cols_label(highest_list_size = "maximum list size") %>%
+  tab_options(table.font.size = 10,
+  data_row.padding = px(1)) %>%
+    tab_style(
+      style = cell_borders(
+      sides = "all",
+      color = "black",
+      weight = px(1.5),
+      style = "solid"
+    ),
+    locations = list(cells_body(), cells_column_labels())) %>% tab_style(
+      style = cell_borders(
+      sides = "all",
+      color = "black",
+      weight = px(1.5),
+      style = "solid"
+    ),
+    locations = list(cells_body(), cells_column_labels())) 
+
+
 ```
 
 ## Practices lost when filtering to 20mg.
@@ -83,15 +369,11 @@ atorvastatin_20_practices <- df_atorvastatin_prac_20 %>%
   group_by(practice) %>%
   summarise(practice=last(practice)) 
 
-n_atorvastatin_20_practices <- atorvastatin_20_practices %>%
-  nrow() ## 6845
 
-atorvastatin_practices <- df_atorvastatin_prac %>%
-  group_by(practice) %>%
-  summarise(practice=last(practice)) 
-  
-n_atorvastatin_practices <- atorvastatin_practices %>%
-  nrow()  ## 6858
+n_atorvastatin_20_practices <- atorvastatin_20_practices %>%
+  nrow() ## 6845, (n_atorvastatin_practices 6858)
+
+
 
 ### identify lost practices
 id_ator_lost_list <- atorvastatin_practices %>% 
@@ -117,79 +399,22 @@ df_ator_lost_list <- id_ator_lost_list %>%
   select(practice,prac_name,sicbl,name,regional_team_id,region) %>%
   ungroup()
 
-gt(df_ator_lost_list) 
+gt(df_ator_lost_list) %>%
+  sub_missing(missing_text = "-") %>%
+  tab_options(table.font.size = 10,
+  data_row.padding = px(1)) %>% 
+    tab_style(
+      style = cell_borders(
+      sides = "all",
+      color = "black",
+      weight = px(1.5),
+      style = "solid"
+    ),
+    locations = list(cells_body(), cells_column_labels())) 
 
 ```
 
-## Practices contributing to all months.
-
-```{r}
-#| label: all-month-filter
-#| include: false
-
-# count number of times each practice contributes 
-prac_count<-df_atorvastatin_prac %>% 
-    group_by(practice,month) %>% 
-    summarise(practice =last(practice)) %>%
-    count(practice) ## 6858
-    
-if( nrow(prac_count) != n_atorvastatin_practices){ print("Practice count does not match with above method")}
-
-# do we lose practices in the filter?
-prac_count_all_months<-prac_count %>% 
-    filter(n==67) # 6,167
-
-
-```
-
-\`
-
-`{r} label_number_n(nrow(prac_count_all_months))` of `{r} label_number_n(nrow(prac_count))` practices prescribed atorvastatin throughout the study period. `{r} label_number_n(nrow(prac_count)-nrow(prac_count_all_months))` practices will be lost by restricting to practices which prescribe every month of the study.
-
-TODO: Look at list size of dropped practices
-
-## Missing Sub ICB Locations
-
-The list size, Sub ICB Location, and practice name come from the `practice_statistics` table. This table does not include information for all of the practices.
-
-```{r}
-#| label: miss-sicbl
-#| echo: false
-#| warning: false
-
-### how many practices are missing sicbl code  
-miss_ccg <- df_atorvastatin_prac  %>% 
-  left_join(df_stats_prac) %>% 
-  filter(is.na(sicbl)) # 4,415 lines with missing sicbl
-
-miss_ccg_id <- miss_ccg %>%
-  group_by(practice) %>%
-  summarise(practice=last(practice)) #399 practices missing ccg (means missing list size)
-
-```
-
-There are `{r} label_number_n(nrow(miss_ccg_id))` practices missing from the `practice_statistics` table, contributing `{r} label_number_n(nrow(miss_ccg))` months of data. Practices are missing across all regions.
-
-```{r}
-#| label: table-miss-ccg-by-region
-#| echo: false
-#| warning: false
-miss_ccg_by_region <- miss_ccg %>%
-  group_by(practice) %>%
-  summarise(practice=last(practice),
-            regional_team=last(regional_team)) %>% #399 practices missing ccg (means missing list size)
-  left_join(df_regions) %>%
-  group_by(region) %>%
-  count() %>%
-  ungroup()
-
-if( sum(miss_ccg_by_region$n) != nrow(miss_ccg_id)){ print("Practice count does not match with above method")}
-
-gt(miss_ccg_by_region) 
-
-```
-
-# Compare region and practice tables
+## Compare region and practice tables
 
 ```{r}
 #| label: compare-to-monthly
@@ -238,14 +463,14 @@ if( min(df_atorvastatin_prac_compare$items,na.rm = T) != 0 | max(df_atorvastatin
 
 ```
 
-# Changing region
+## Changing region
 
 ### SICBL changing regions
 
-
 Sub-ICB locations (SICBL) can be identified via 2 different columns in the `practice_statistics` dataset. `ccg_id` (renamed `sicbl` in this dataset) is static and shows the SICBL as of (??Date??). `stp_id` shows the SICBL as it was at the time. Using the `stp_id`.
 
-The difference in population between the `pct_id` and `ccg_id` definition of SICBL can be seen when plotting the list size per mont for each region. In the `pct_id` plot there is a dip in list size in the North West in June 2022, corresponding to a rise in Midlands. 
+The difference in population between the `pct_id` and `ccg_id` definition of SICBL can be seen when plotting the list size per month for each region. In the `pct_id` plot there is a dip in list size in the North West in June 2022, corresponding to a rise in Midlands.
+
 ```{r}
 #| label: figure-list-size-season-pct
 #| echo: false
@@ -296,9 +521,7 @@ seasons_combined_list_size_pct
 
 ```
 
-
 However, we do not see the same dip in the `ccg_id` plot.
-
 
 ```{r}
 #| label: figure-list-size-season-sicbl
@@ -353,7 +576,6 @@ seasons_combined_list_size_sicbl
 
 ```
 
-
 ```{r}
 #| label: ccg-region-change
 #| echo: false
@@ -400,7 +622,7 @@ Practices from `{r}  nrow(sicbl_change)` SICBL change region during the study pe
 # gt(sicbl_change_regions)
 ```
 
-### practices changing region
+### Practices changing region
 
 ```{r}
 #| label: practice-region-change
@@ -430,18 +652,8 @@ practice_change_regions <- practice_change %>%
             pct_id =last(pct_id),
             month = last(month))) %>%
                 arrange(practice, month) 
-                
-```
 
-There were `{r} length(unique(practice_change_regions$practice))` practices, from `{r} length(unique(practice_change_regions$stp_id ))` Integrated Care Boards (ICB), which changed region during the study period.
-
-```{r}
-#| label: table-practice-region-change
-#| echo: false
-#| warning: false
-               
-df_stp <- read_csv(here::here(directory_name,"prac_stps.csv")) 
-
+### df_stp previously loaded from prac_stps.csv 
 tab_practice_change_regions <-  practice_change_regions  %>%
                 mutate(counter = row_number(practice),
                 direction = case_when(counter ==1 ~ "From",
@@ -451,7 +663,18 @@ tab_practice_change_regions <-  practice_change_regions  %>%
                 select(practice,direction,region,name,sicbl_name,pct_id,month) %>%
                 pivot_wider(names_from = direction, values_from = c(region,name,sicbl_name,pct_id,month)) %>%
                 select(-month_To) %>%
-  ungroup()
+  ungroup()              
+                
+```
+
+There were `{r} length(tab_practice_change_regions$practice)` practices, from `{r} length(unique(tab_practice_change_regions$sicbl_name_To))` Integrated Care Boards (ICB), which changed region during the study period.
+
+```{r}
+#| label: table-practice-region-change
+#| echo: false
+#| warning: false
+               
+
 
 gt(tab_practice_change_regions) %>%
   cols_label(
@@ -480,7 +703,17 @@ gt(tab_practice_change_regions) %>%
      tab_spanner(
     label = "Region",
     columns = starts_with("region")
-  ) 
+  ) %>%
+  tab_options(table.font.size = 10,
+  data_row.padding = px(1)) %>% 
+    tab_style(
+      style = cell_borders(
+      sides = "all",
+      color = "black",
+      weight = px(1.5),
+      style = "solid"
+    ),
+    locations = list(cells_body(), cells_column_labels())) 
 ```
 
 In order to investigate if the practices change list size when they move region I plotted the list size by month.
@@ -495,12 +728,6 @@ id_practice_change_regions <-  practice_change_regions  %>%
                 filter(counter=="1") %>%
                 select(practice,month) %>% 
                 mutate(month =as.Date(month)) %>% 
-  ungroup()
-
-
-df_atorvastatin_prac_region <- df_atorvastatin_prac %>% 
-  left_join(df_stats_prac) %>%
-  mutate(month =as.Date(month)) %>% 
   ungroup()
 
 
@@ -539,9 +766,8 @@ print(plot_practice_change_regions)
 
            
 ```
- 
- 
-Although the practices all had large changes in list size after the change in region this could be seen as a continuation of the pattern seen before the practice change. 
+
+Although the practices all had large changes in list size after the change in region this could be seen as a continuation of the pattern seen before the practice change.
 
 ## Missing list sizes
 
@@ -582,8 +808,7 @@ df_atorvastatin_nolist_id <- df_atorvastatin_nolist %>%
  # right_join(df_atorvastatin_nolist_id)  ### some missing at start, some at end, some all the way
 ```
 
-`{r} label_number_n(n_df_atorvastatin_nolist)` out of `{r} label_number_n(n_df_atorvastatin_list + n_df_atorvastatin_nolist) ` (`{r} n_df_atorvastatin_nolist/(n_df_atorvastatin_list + n_df_atorvastatin_nolist)`%) items were prescribed from a practice with no associated list size. There were `{r} nrow(df_atorvastatin_nolist_id)` practices with prescriptions without an associated list size.
-
+`{r} label_number_n(n_df_atorvastatin_nolist)` out of `{r} label_number_n(n_df_atorvastatin_list + n_df_atorvastatin_nolist)` (`{r} label_perc_n(n_df_atorvastatin_nolist/(n_df_atorvastatin_list + n_df_atorvastatin_nolist))`) items were prescribed from a practice with no associated list size. There were `{r} nrow(df_atorvastatin_nolist_id)` practices with prescriptions without an associated list size.
 
 ```{r}
 #| label: figure-missing-list-sizes
@@ -651,7 +876,8 @@ ggsave(
 plot_missing_list_size_prac
 ```
 
-An example of a practice that has prescribing data with no list size for a period before it has both prescribing and list size can be seen in practice `Y07040` below:  
+An example of a practice that has prescribing data with no list size for a period before it has both prescribing and list size can be seen in practice `Y07040` below:
+
 ```{r}
 #| label: figure-missing-list-sizes-lead-in
 #| echo: false
@@ -668,10 +894,10 @@ plot_prac_1
 
 ```
 
-Practice `Y07040` is Medicus Select Care. This is an example of a Special Allocation Scheme (SAS) practice. The SAS program provides primary care services to patients who have been removed from their regular GP practice list due to violent or aggressive behavior that was reported to the police. This is not a typical GP practice. 
-
+Practice `Y07040` is Medicus Select Care. This is an example of a Special Allocation Scheme (SAS) practice. The SAS program provides primary care services to patients who have been removed from their regular GP practice list due to violent or aggressive behavior that was reported to the police. This is not a typical GP practice.
 
 An example of a practice that has prescribing data with no list size throughout the study period can be seen in practice `Y02666` below:
+
 ```{r}
 #| label: figure-missing-list-sizes-always-missing
 #| echo: false
@@ -687,9 +913,10 @@ plot_prac_2<-missing_list_size_prac %>%
 plot_prac_2
 ```
 
-Practice `Y07040` is Salisbury walk-in centre. As a walk in centre there is no fixed patient list. However, it is able to presribe atorvastatin.  
+Practice `Y07040` is Salisbury walk-in centre. As a walk in centre there is no fixed patient list. However, it is able to prescribe atorvastatin.
 
-An example of a practice that has prescribing data with no list size for a period after it has both prescribing and list size can be seen in practice `L83642` below:  
+An example of a practice that has prescribing data with no list size for a period after it has both prescribing and list size can be seen in practice `L83642` below:
+
 ```{r}
 #| label: figure-missing-list-sizes-end-out
 #| echo: false
@@ -705,8 +932,7 @@ plot_prac_3
 
 ```
 
-Practice `L83642` is Estover Surgery. Estover surgery closed, however, due to electronic repeat dispensing (eRD) atorvastatin may still be dispensed for 6-12 months after closing.  
-
+Practice `L83642` is Estover Surgery. Estover surgery closed, however, due to electronic repeat dispensing (eRD) atorvastatin may still be dispensed for 6-12 months after closing.
 
 # "Opening" practices
 
@@ -726,22 +952,38 @@ id_miss_start<-df_atorvastatin_prac_region %>%
     count(NAs = is.na(total_list_size)) %>%  ### remove practices that are always missing listsize
     arrange(practice,NAs) %>%
     filter(NAs==F) %>%
+    select(practice) 
+
+  miss_start_sas <- setting_sas %>%
+    inner_join(id_miss_start) %>%
     select(practice) %>%
     unlist()
 
+other_atypical <- df_setting %>%
+  anti_join(setting_sas)
+
+miss_start_other_atypical <- other_atypical %>%
+ inner_join(id_miss_start) %>%
+ select(practice) %>%
+ unlist()
+
+miss_start_just_normal_practices <- id_miss_start %>%
+ anti_join(df_setting) %>%
+ select(practice) %>%
+ unlist()
+
 ```
 
-I defined opening practices as practices with no atorvastatin prescribing at the start of the study period. There were `{r} length(id_miss_start)` practices that opened during the study period. In order to investigate if there is any pattern to opening practices I plotted their list size per month.   
+I defined opening practices as practices with no atorvastatin prescribing at the start of the study period. There were `{r} nrow(id_miss_start)` practices that opened during the study period. In order to investigate if there is any pattern to opening practices I plotted their list size per month.
+
+`{r} length(miss_start_sas)` of these practices are SAS practices.
 
 ```{r}
-#| label: plot-miss-start
+#| label: miss_start_sas
 #| echo: false
 #| warning: false
-#| fig.width: 30
-#| fig.height: 10
-
-for(prac in id_miss_start){
-     plot_opening_practices <- df_atorvastatin_prac_region %>% 
+for(prac in miss_start_sas){
+  plot_opening_practices <- df_atorvastatin_prac_region %>% 
            filter(practice==prac) %>%
            ggplot(aes(x = month, y = total_list_size)) +
            geom_line() +
@@ -769,7 +1011,80 @@ print(plot_opening_practices)
   )
 
 }
+```
 
+`{r} length(miss_start_other_atypical)` of these practices are specialist, urgent, asylum, pilot or nursing home practices.
+
+```{r}
+#| label: miss_start_other_atypical
+#| echo: false
+#| warning: false
+for(prac in miss_start_other_atypical){
+  plot_opening_practices <- df_atorvastatin_prac_region %>% 
+           filter(practice==prac) %>%
+           ggplot(aes(x = month, y = total_list_size)) +
+           geom_line() +
+           scale_y_continuous(labels = label_comma()) +
+           scale_x_date(date_breaks = "4 months") +
+           theme(axis.text.x = element_text(angle =90)) +
+                        ggtitle(glue("{prac} {df_stats_prac %>% group_by(practice) %>% summarise(name=last(name)) %>% filter(practice ==prac)%>%select(name) %>% unlist()}")) +
+           xlim(as.Date("2020-01-01"),as.Date("2025-08-01"))
+
+print(plot_opening_practices)
+
+  ggsave(
+    filename = here::here(
+      "output",
+      "data_check",
+      "atorvastatin",
+      "opening_practices",
+      glue("opening_practices_{prac}.png")),
+    plot_opening_practices,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+
+}
+```
+
+The remaining `{r} length(miss_start_just_normal_practices)` practices are correctly categorised as GP practices.
+
+```{r}
+#| label: miss_start_just_normal_practices
+#| echo: false
+#| warning: false
+for(prac in miss_start_just_normal_practices){
+  plot_opening_practices <- df_atorvastatin_prac_region %>% 
+           filter(practice==prac) %>%
+           ggplot(aes(x = month, y = total_list_size)) +
+           geom_line() +
+           scale_y_continuous(labels = label_comma()) +
+           scale_x_date(date_breaks = "4 months") +
+           theme(axis.text.x = element_text(angle =90)) +
+                        ggtitle(glue("{prac} {df_stats_prac %>% group_by(practice) %>% summarise(name=last(name)) %>% filter(practice ==prac)%>%select(name) %>% unlist()}")) +
+           xlim(as.Date("2020-01-01"),as.Date("2025-08-01"))
+
+print(plot_opening_practices)
+
+  ggsave(
+    filename = here::here(
+      "output",
+      "data_check",
+      "atorvastatin",
+      "opening_practices",
+      glue("opening_practices_{prac}.png")),
+    plot_opening_practices,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+
+}
 ```
 
 # "Closing" practices
@@ -789,12 +1104,52 @@ id_miss_end<-df_atorvastatin_prac_region %>%
     count(NAs = is.na(total_list_size)) %>%  ### remove practices that are always missing listsize
     arrange(practice,NAs) %>%
     filter(NAs==F) %>%
-    select(practice) %>%
-    unlist()
+    select(practice) 
+
+ id_atypical_end <- id_miss_end %>% 
+  inner_join(df_setting) %>% 
+  select(practice) %>% 
+  unlist()
+
+id_miss_end <- id_miss_end %>%
+  unlist()
 ```
 
-Similarly, I defined closing practices as practices with no atorvastatin prescribing at the end of the study period. There were `{r} length(id_miss_end)` practices that opened during the study period. In order to investigate if there is any pattern to closing practices I plotted their list size per month. I have included a selection of these plots which are indicative of 4 differnet patterns.     
- 
+Similarly, I defined closing practices as practices with no atorvastatin prescribing at the end of the study period. There were `{r} length(id_miss_end)` practices that opened during the study period. In order to investigate if there is any pattern to closing practices I plotted their list size per month.
+
+`{r} length(id_miss_end)` of the closing practices were typical.
+
+```{r}
+#| label: miss_end_atypical
+#| echo: false
+#| warning: false
+for(prac in id_atypical_end ){
+  plot_opening_practices <- df_atorvastatin_prac_region %>% 
+           filter(practice==prac) %>%
+           ggplot(aes(x = month, y = total_list_size)) +
+           geom_line() +
+           scale_y_continuous(labels = label_comma()) +
+           scale_x_date(date_breaks = "4 months") +
+           theme(axis.text.x = element_text(angle =90)) +
+                        ggtitle(glue("{prac} {df_stats_prac %>% group_by(practice) %>% summarise(name=last(name)) %>% filter(practice ==prac)%>%select(name) %>% unlist()}")) +
+           xlim(as.Date("2020-01-01"),as.Date("2025-08-01"))
+
+print(plot_opening_practices)
+
+}
+```
+
+I have included a selection of the remaining plots which are indicative of 4 different patterns.
+
+A sharp decrease in list size before closing ![sharp_decrease](../output/data_check/atorvastatin/closing_practices/closing_practices_L85612.png)
+
+Slow decrease in list size before closing ![slow_decrease](../output/data_check/atorvastatin/closing_practices/closing_practices_C81028.png)
+
+A period of low list size before closing ![long_tail](../output/data_check/atorvastatin/closing_practices/closing_practices_Y03051.png)
+
+No decrease in list size before closing ![no_decrease](../output/data_check/atorvastatin/closing_practices/closing_practices_G82671.png)
+
+Activity after closing ![activity_after_closing](../output/data_check/atorvastatin/closing_practices/closing_practices_F86642.png)
 
 ```{r}
 #| label: plot-miss-end
@@ -832,4 +1187,3 @@ for(prac in id_miss_end){
 }
 
 ```
-
