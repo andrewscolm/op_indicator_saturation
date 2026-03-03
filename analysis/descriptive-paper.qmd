@@ -1,0 +1,781 @@
+---
+title: "Descriptive Paper"
+format: html
+---
+
+## OpenPrescibing
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(dplyr)
+library(readr)
+library(here)
+library(glue)
+library(tidyr)
+library(stringr)
+library(scales) ## format label_number
+library(gt) ## gt table
+library(ggplot2)
+library(fpp2) # Forecasting: Principles and Practice" (2nd Edition)
+library(tinyplot)
+library(marginaleffects) #predictions function
+library(lme4)
+library(lubridate) # interval
+library(astsa) # acf2
+library(forecast)
+library(zoo)
+
+source("analysis/design.R")
+
+source("analysis/imports.R")
+
+label_number_n <- label_number(1, 1, big.mark=",")
+label_perc_n <- label_percent(accuracy =.0001)
+
+
+df_hscic_stp <- read_csv(here::here(directory_name,"prac_stps.csv")) 
+
+###  
+df_hscic_ccgs <- read_csv(here::here(directory_name,"prac_ccgs.csv")) %>%
+  dplyr::select("code","name","stp_id", "regional_team_id","org_type") 
+
+df_hscic_practice_statistics <- read_csv(here::here(directory_name,"practice_statistics.csv"))
+
+df_hscic_practices <- read_csv(here::here(directory_name,"practices.csv"))
+
+df_hscic_normalised_prescribing <- read_csv(here::here(directory_name,"normalised_prescribing.csv.gz"))
+
+regions <-unique(df_regions$region)
+```
+
+### Background
+
+The National Institute for Health and Clinical Excellence (NICE) produces evidence-based guidance on which medicines the NHS should provide. This guidance can support the diffusion of innovation within primary health care. Examples of NICE guidance include technological appraisals and NICE guidelines. A technological appraisal aims to help standardise access to healthcare across England by providing a review of clinical evidence and cost effectiveness of a treatment by an independent advisory committee. There is a legal obligation for the NHS to fund and resource medicines and other treatments recommended by NICE's technology appraisals. When NICE recommends a treatment 'as an option', the NHS must make sure it is available within 3 months of its date of publication. NICE guidelines are designed to support shared decision making around prescribing medicines. NICE recommendations are based on the trade-off between the benefits and harms of an intervention taking into account the quality of the underpinning evidence. Some recommendations are made with more certainty than others. NICE word their recommendations to reflect this. The word “offer” indicates there is clear and strong evidence of benefit. Where the benefit is less certain, NICE uses the words ‘consider’ or ‘do not rule out’.
+
+Despite this robust development process, compliance with NICE guidelines in primary care is highly variable. The factors which drive the uptake of NICE guidance are poorly understood. There are currently no systematic or robust methods to assess variation in the diffusion of innovation between general practices or to identify when practices adopt NICE guidance. It is important to understand variation in general practice as delayed guidance uptake may lead to poorer outcomes for patients and may be linked with inequalities in health. It is not feasible to assess all the data by hand. Assessing variation requires an automated approach. Statistical methods can detect changes in time series data, however, the use of these techniques in medical time series data is in its infancy, and there is little guidance in how to best apply them.
+
+The emergence of NHS datasets with national coverage provides an opportunity to monitor evidence for and the impact of changing treatment guidance systematically, at practice and patient levels. OpenSAFELY-TPP is a platform that provides access to electronic health records across \~45% of English primary care practices. 24 million people are currently registered with GP surgeries using TPP SystmOne software. When OpenSAFELY-EMIS is available this could be extended to cover 99% of the English population.
+
+Cardiovascular disease (CVD) is a leading cause of mortality and morbidity worldwide responsible for an estimated 17.9 million deaths each year. The NHS Long Term plan has made CVD reduction a priority target for the NHS. There are a range of treatments available proven to lower the risk of cardiovascular disease either as a primary or secondary intervention, leading to improved patient outcomes.
+
+Statins have been shown to reduce CVD events and mortality, and are recommended in clinical guidelines for the primary prevention of CVD for patients with an elevated cardiovascular risk score. Atorvastatin is the most commonly prescribed statin in the UK and is usually the first choice statin for the primary prevention of CVD.
+
+Inclisiran is a low-density lipoprotein cholesterol (LDL-C) lowering medication. Clinical trial evidence has shown that inclisiran can lower LDL-C levels when statins or other lipid-lowering therapies have not reduced them enough. It is used as an option for treating primary hypercholesterolaemia. Overall prescribing rates of inclisiran are known to be low and show high regional variation.
+
+Effective weight management techniques can also significantly reduce the risk of cardiovascular disease. Tirzepatide has been made available on the NHS as a treatment for managing obesity. It is being introduced via a phased implementation supported by interim commissioning guidance from NHS England.
+
+Taken together these three treatments serve as examples of three different categories of change in treatment recommendation and may represent important factors in the uptake of NICE guidance.
+
+-   A change in scope regarding which patients are eligible for a given treatment
+
+    -   A NICE guideline released in May 2023 changed the eligible population for atorvastatin treatment. They recommended prescribers “do not rule out treatment with atorvastatin” for primary prevention of cardiovascular disease in patients with a cardiovascular risk score of 5-10%, making a large population at lower risk of cardiovascular disease eligible for treatment.
+
+-   Approval of a new treatment
+
+    -   A technology appraisal for a new medication in October 2021, with inclisiran being recommended by NICE as an option for treating primary hypercholesterolaemia in those who have previously had a cardiovascular event and have persistently high LDL-C levels.
+
+-   A phased implementation of a new treatment
+
+### Study Rationale
+
+Previous research has highlighted the importance of strategies to improve guideline adherence. Adherence to guidelines has been shown to substantially improve cardiovascular risk and prevent unnecessary cardiovascular morbidity and mortality. Delayed guidance uptake may lead to poorer outcomes for patients and may be linked with inequalities in 
+health. Inequalities in the prescription of cardiovascular medication in primary care settings have been identified with women, ethnic minorities; and people living in more deprived areas being less likely to be prescribed cardiovascular medicines as per guidelines. Reducing inequalities is a key aim of the Core20plus5 national framework. NHS services are already overwhelmed so understanding factors contributing to delays in the adoption of best practice with regard to both cost effectiveness assessment and clinical outcomes will help to reduce the burden of cardiovascular disease overall particularly for minority groups, who are at higher risk of poor health outcomes. 
+
+Existing literature provides theoretical frameworks for understanding the dissemination of 
+innovations in Health Care.(Wainwright and Waring 2007; Berwick 2003) However Eccles et al caution that these theoretical frameworks are still in their infancy. Most of our understanding on the adoption of guideline and diffusion of evidence comes from qualitative work. Steffensen et al22 have used a case study design to investigate whether the concept 
+of early or late adopters is universal for the diffusion of all new drugs, they found that being a late adopter for one drug type was not a good predictor of being a late adopter of separate drug types. Croker et al23 used a cohort study design and surveys and found substantial variation in the adoption of prescribing guidelines for antibiotics for urinary tract infections. Prosser et al24 and Jones et al25 have conducted qualitative studies to understand what influences GPs prescription choices for new drugs suggesting complex multi pathway approaches to understanding prescribing behaviours involving biomedical evaluation, critical appraisal, social influences and early experience of using a drug. An awareness of the complex multi pathway approaches to understanding variation in prescribing will be vital to interpreting my research. 
+
+Previous quantitative work assessing implementation of new practices has typically relied on measuring change at the level of a whole population. Curtis et al have used interrupted time series analysis (ITSA) finding that the uptake of NICE guidance on tamoxifen prescribing was slow. Similarly Walker et al used ITSA finding that substantial changes in antibiotic prescribing rates after the Chief Medical Officer highlighted need for 'strong action' to battle antimicrobial resistance. Using ITSA Minchin et al found removing financial incentives was associated with an immediate decline in performance on quality measures across 2819 English primary care practices. Several studies have used static measures of variation in care at one point in time.
+
+There are over 6000 individual GP practices in England, therefore, it would not be feasible to evaluate practices individually. Assessing variation between general practices in the diffusion of innovation requires a systematic and robust automated data-driven method to identify when practices have made a change. Existing literature is sparse. There is no definitive review of techniques to assess variation in guidance adoption in healthcare.
+
+One possible approach is the use of indicator saturation, traditionally used in economic and climate modelling, which has been pioneered for use in medical time series data by the Bennet Institute for Applied Data Science. Indicator saturation has previously been used to detect substantial variation in clinicians’ responsiveness to warranted changes in clinical practice for the prescribing of desogestrel and trimethoprim. By continuing to develop this novel data-driven method for assessing variation in guidance adoption I can assess variation at a practice level and identify potential geographical clustering in adoption. By comparing indicator saturation with a) other data-driven break detection techniques and b) approaches where a priori change points are specified I will identify the strengths and limitations of a range of approaches. 
+
+### Objectives
+
+I aim to understand how statistical techniques can be used to investigate variation in practices’ timing of the adoption of new treatment guidance, and develop a data-driven approach to understanding the determinants of the diffusion of innovation in cardiovascular disease. I will develop a systematic framework which could be applied across a range of medicines in order to learn from outlying practices (both early and late adopters of NICE guidelines) to understand the consequences of recommendations and identify factors which increase the adoption of NICE guidelines in order to ultimately improve patient outcomes.
+
+Objective 1. Perform a rapid review of statistical techniques to quantify variation on guidance adoption. 
+
+Objective 2. Apply these methods to the uptake of three different treatments for cardiovascular disease in response to NICE guidance, which are characteristic of a range of guidance scenarios. In order to understand what factors are associated with variability in the response of primary care clinicians to a change in NICE guidance on cardiovascular treatments.
+
+Objective 3. Develop a reusable framework, including standard code, codelists and data extraction techniques to apply these methods for a wider range of treatments. 
+
+Objective 4. Work with policy and clinical experts to develop a communication plan to inform NICE guidelines developers and individual practices of my findings in order to maximise the impact of my study.
+
+### OpenPrescribing data
+
+NHS Digital publishes monthly and annual prescribing datasets from the NHS Business Services Authority, along with static reports on prescribing trends. However, this does not allow readers to interrogate topics of interest in detail, and the large datasets can be complex to manage. OpenPrescribing.net is a service that facilitates exploration of outliers and trends for individual general practices in NHS England. OpenPrescribing aggregates all available prescription cost analysis (PCA) data into a single data frame for longitudinal analysis of trends, to generate an interactive online service where any user can explore and monitor time trends in prescribing using the latest available data and to share all resources for reuse by others as open data. This data is available from 2010 onwards. All data is normalised to enable the exploration of prescribing trends for individual members of a class of drugs over time. To achieve this consistency, each drug is mapped to its current position in the latest BNF dictionary up to the level of its 11-character ‘product’ code through an incremental process. For every General Practice (GP) in England, the cost and quantity of dispensed prescriptions by drug is published. GP practice data is attributed to LSOA spatial units via NHS Digital’s GP practice register datasets, allowing GP-level prescribing to be approximated at neighbourhood-level. This data is not linked to patient-level data so does not allow for identification of sub-populations of interest. 
+
+### Methods
+For each region I have plotted the rate of prescribing, as defined by the number of items per region population where items is a count of the number of times a medicine has been prescribed. Items do not take into account the quantity of medicine prescribed, a prescription for one week's worth of medicine would count as equal to several week’s worth of medicine. 
+In order to investigate seasonality trends I also plotted the rate of prescribing against the individual years in which the data were observed.
+
+```{r}
+#| label: linear-itsa
+
+df_atorvastatin <- read_csv(here::here(directory_name,"atorvastatin_list.csv")) %>%
+  filter(str_detect(bnf_name, '20')) %>%
+  group_by(month,regional_team) %>%
+  summarise(items=sum(items),
+            total_list_size=mean(total_list_size),
+            rate = items / total_list_size *1000)  %>%
+  ungroup() %>%
+  mutate(guidance = case_when(month < date_atorvastatin_ng~0,
+                              month >= date_atorvastatin_ng ~1),
+         time = interval(min(month),month) %/% months(1),
+         year = year(month),
+         month_number = month(month))
+
+split_above <- interval(min(df_atorvastatin$month),date_atorvastatin_ng) %/% months(1)
+split_below <-  split_above - 1
+
+df_regions <- read_csv(here::here("data","NHS_England_Names_and_Codes_in_England.csv")) %>%
+  rename(regional_team = NHSER24CDH ,region = NHSER24NM) %>%
+  dplyr::select(regional_team,region)
+
+df_atorvastatin <- df_atorvastatin %>%
+  left_join(df_regions)
+
+regions <-unique(df_regions$region)
+df_slope <- tibble()
+df_comparison <-tibble()
+
+for(i in regions){
+  
+  
+  assign(glue("season_plot_{i}"), ggseasonplot(ts(df_atorvastatin %>% filter(region == i) %>% dplyr::select(rate), start = c(2020,01), frequency = 12),main = glue("{i} seasonal plot")))
+  
+  
+  assign(glue("decomp_plot_{i}"), ts(df_atorvastatin %>% filter(region == i) %>% dplyr::select(rate), 
+     start = c(df_atorvastatin %>% filter(region == i)  %>% filter(month == min(month)) %>% dplyr::select(year),
+               df_atorvastatin %>% filter(region == i)  %>% filter(month == min(month)) %>% dplyr::select(month_number)), 
+     frequency = 12) %>% decompose(type="additive") %>%
+    autoplot() + xlab("Year") + ggtitle(glue("Decompostition {i}")))
+  
+  
+  tinyplot(rate ~ month | guidance, type = "p", palette = "okabeito",
+           data = transform(df_atorvastatin %>% filter(region == i), guidance = factor(guidance)))
+  
+  mod <- lm(rate ~ time * guidance, data = df_atorvastatin %>% filter(region == i))
+  summary(mod)
+  
+  # what would be the predicted outcome at time X with or without intervention?
+  p0 <- predictions(mod, newdata = datagrid(time = max(df_atorvastatin$time-1), guidance = 0))
+  p1 <- predictions(mod, newdata = datagrid(time = max(df_atorvastatin$time), guidance = 1))
+  
+  p0
+  p1
+  
+  # is the difference between those predictions statistically significant?
+  df_comparison_i<-tibble(comparisons(mod, variables = "guidance", newdata = datagrid(time = split_above)))  %>% bind_cols(region = i)
+  df_comparison <- df_comparison %>%
+    bind_rows(df_comparison_i)
+  # What is the average slope of the outcome equation with respect to time, before and after the intervention?
+  df_slope_i<-tibble(avg_slopes(mod, variables = "time", by = "guidance"))  %>% bind_cols(region = i)
+  df_slope <- df_slope %>%
+    bind_rows(df_slope_i)
+  
+  # Many analysts like to visualize the results of an ITS analysis, by plotting the predicted outcome for the control group, knowing that these predictions are counterfactual after the intervention. This can be done by first make predictions for all combinations of time and treatment, dropping the observations we do not want to plot, and feeding the data to a plotting package like ggplot2.
+  intervention <- split_below
+  
+  p <- predictions(mod, variables = c("time", "guidance"))
+  p <- subset(p, time > split_below | guidance == 0)
+  assign(glue("naive_itsa_plot_{i}"), ggplot(p, aes(x = time, y = estimate, color = factor(guidance))) +
+    geom_line() +
+    labs(title = glue("Predicted outcome over time {i}"),
+         x = "Time",
+         y = "Rate of prescribing") +
+    geom_point(data=df_atorvastatin %>% filter(region==i),aes(x = time, y = rate)))
+ 
+ # ggsave(
+ #   filename = here::here(
+ #     "output",
+ #     "isat",
+ #     "atorvastatin",
+ #     glue("atorvastatin_{i}_itsa_plot.png")),
+ #   df_plot,
+ #   dpi = 600,
+ #   width = 40,
+ #   height = 15,
+ #   units = "cm"
+ # )
+}
+
+
+decomp_combined <- patchwork::wrap_plots(`decomp_plot_East of England`,`decomp_plot_London`,`decomp_plot_Midlands`, `decomp_plot_North East and Yorkshire`,
+                                          `decomp_plot_North West`,`decomp_plot_South East`,`decomp_plot_South West`)
+
+ggsave(
+  filename = here::here(
+    "output",
+    "descriptive",
+    "atorvastatin",
+    glue("atorvastatin_decomp_combined.png")),
+  decomp_combined,
+  dpi = 600,
+  width = 60,
+  height = 45,
+  units = "cm"
+)
+
+seasons_combined <- patchwork::wrap_plots(`season_plot_East of England`,`season_plot_London`,`season_plot_Midlands`, `season_plot_North East and Yorkshire`,
+                                          `season_plot_North West`,`season_plot_South East`,`season_plot_South West`)
+                                        
+ggsave(
+  filename = here::here(
+    "output",
+    "descriptive",
+    "atorvastatin",
+    glue("atorvastatin_seasons_combined.png")),
+  seasons_combined,
+  dpi = 600,
+  width = 40,
+  height = 15,
+  units = "cm"
+)
+
+naive_itsa_combined <- patchwork::wrap_plots(`naive_itsa_plot_East of England`,`naive_itsa_plot_London`,`naive_itsa_plot_Midlands`, `naive_itsa_plot_North East and Yorkshire`,
+                                       `naive_itsa_plot_North West`,`naive_itsa_plot_South East`,`naive_itsa_plot_South West`)
+
+
+ggsave(
+  filename = here::here(
+    "output",
+    "isat",
+    "atorvastatin",
+    glue("atorvastatin_naive_itsa_combined.png")),
+  naive_itsa_combined,
+  dpi = 600,
+  width = 50,
+  height = 20,
+  units = "cm"
+)
+
+write_csv(df_comparison,
+  here::here(
+  "output",
+  "descriptive",
+  "atorvastatin",
+  glue("atorvastatin_itsa.csv"))
+  )
+
+
+```
+
+
+```{r}
+#| label: non-linear-itsa
+
+df_slope <- tibble()
+df_comparison <-tibble()
+
+for(i in regions){
+  quet.ts <- ts(df_atorvastatin %>% filter(region == i) %>% dplyr::select(rate), start = c(2020,01), frequency = 12)
+  
+  options(scipen=5)
+  plot(quet.ts, type='l', col="blue", xlab="Month", ylab="rate")
+
+  acf2(quet.ts, max.lag=split_above)
+
+  model1 <- auto.arima(quet.ts, seasonal=TRUE, max.d=1, max.D=1, stepwise=FALSE, trace=TRUE)
+
+  model2 <- Arima(window(quet.ts, end=c(2023,05)), order=c(2,1,0), seasonal=list(order=c(0,1,1), period=12))
+
+  fc <- forecast(model2, h=26)
+  
+  fc.ts <- ts(as.numeric(fc$mean), start=c(2023,6), frequency=12)
+
+  # quet.ts.2 <- ts.union(quet.ts, fc.ts)
+
+  quet_ts <- as_tibble(quet.ts) %>%
+    reframe(rate,
+    month = as.Date("2019-12-01")%m+% months(row_number()),
+    impact="observed")
+
+   fc_ts <- as_tibble( fc.ts) %>%
+    reframe(rate=x,
+    month = as.Date("2023-05-01")%m+% months(row_number()),
+    impact="Predicted")
+
+itsa<-quet_ts %>%
+  bind_rows(fc_ts)
+ 
+
+ assign(glue("itsa_plot_{i}"),  
+  itsa %>% 
+  ggplot(aes(x=month,y=rate,color=impact)) +
+  geom_line()+
+      labs(title = glue("Predicted outcome over time {i}"),
+         x = "Time",
+         y = "Rate of prescribing") )
+
+
+}
+
+itsa_combined <- patchwork::wrap_plots(`itsa_plot_East of England`,`itsa_plot_London`,`itsa_plot_Midlands`, `itsa_plot_North East and Yorkshire`,
+                                       `itsa_plot_North West`,`itsa_plot_South East`,`itsa_plot_South West`)
+
+
+ggsave(
+  filename = here::here(
+    "output",
+    "descriptive",
+    "atorvastatin",
+    glue("atorvastatin_itsa_combined.png")),
+  itsa_combined,
+  dpi = 600,
+  width = 50,
+  height = 20,
+  units = "cm"
+)
+```
+
+### Atorvastatin
+
+In May 2023 NICE guideline NG2382 recommended prescribers “do not rule out treatment with atorvastatin” for primary prevention of cardiovascular disease in patients with a cardiovascular risk score of 5-10%, making a large population at lower risk of cardiovascular disease eligible for treatment. NICE estimated that this would result in a 5% increase of statin use for people with cardiovascular risk score less than 10%. Based on an estimation of 20% of patients initiated on statins having a QRISK score less than 10%3 and the NICE estimated impact of a 5% increase we would expect to see a 1% increase in the total number of prescriptions attributable to the change in guidelines. With the natural variation in prescribing rates this may be difficult to detect at the population level without narrowing down by specific target population of the NICE guidance.    
+
+There is substantial regional variation in the prescribing rate of atorvastatin before the NICE guideline was introduced in May 2023. Across all 7 regions there is a trend of increased prescribing over time. After the May 2023 guidelines this trend continues. From visual inspection there is no obviously detectable impact that can be seen after the introduction of the May 2023 guideline. There is a clear seasonal pattern across all regions with a dip in the prescribing rate in February followed by a rise in March. However ITSA suggests there is an increase in prescribing rate, across all regions, after the introduction of the May 2023 guideline.
+
+```{r}
+#| label: small sicbl
+
+# filter to 20
+df_atorvastatin_prac_20 <- df_atorvastatin_prac %>%
+  filter(str_detect(bnf_name, '20')) 
+
+df_ccg_count <- df_atorvastatin_prac_20 %>% 
+  inner_join(df_hscic_practice_statistics %>% dplyr::select(practice,total_list_size,month,pct_id)) %>%
+  group_by(month,practice) %>%
+  summarise(items= sum(items),
+            total_list_size= mean(total_list_size),
+            rate= items/ total_list_size,
+            pct_id = last(pct_id)) %>%
+  ungroup() %>%
+  group_by(pct_id) %>%
+  summarise(counter = row_number(pct_id)) %>%
+  summarise(counter=last(counter),
+            pct_id=last(pct_id)) 
+
+
+```
+
+
+```{r}
+#| label: postcode in different sub-ICB
+
+df_atorvastatin_prac_sicbl <- df_atorvastatin_prac_20 %>% 
+  inner_join(df_hscic_practice_statistics) %>%
+  dplyr::select(practice,pct_id)
+
+n_practices_ator <- df_atorvastatin_prac_sicbl %>%
+  group_by(practice) %>%
+  summarise(practice = last(practice)) 
+
+n_sicbl_ator <- df_atorvastatin_prac_sicbl %>%
+  group_by(pct_id) %>%
+  summarise(pct_id = last(pct_id)) 
+
+df_atorvastatin_prac_20_list <- df_atorvastatin_prac_20 %>% 
+  inner_join(df_hscic_practice_statistics %>% dplyr::select(practice,total_list_size,month)) %>%
+  mutate(rate=items/total_list_size*1000) %>%
+  group_by(month,practice) %>%
+  summarise(items= sum(items),
+            total_list_size= mean(total_list_size),
+            rate= items/ total_list_size,
+            month = as.Date(month))
+
+df_practices_count <- read_csv(here::here(directory_name,"practices.csv")) %>%
+  mutate(post_start=substr(postcode,1,3)) %>%
+  group_by(post_start,ccg_id) %>%
+  summarise(post_start=last(post_start),
+            ccg_id=last(ccg_id)) %>%
+  inner_join(df_ccg_count,by=join_by(ccg_id==pct_id)) %>%
+  group_by(post_start) %>%
+  summarise(counter=sum(counter))
+
+df_practices <- read_csv(here::here(directory_name,"practices.csv"))  %>%
+  filter(setting==4) %>%
+  mutate(post_start=substr(postcode,1,3)) %>%
+  group_by(post_start,ccg_id) %>%
+  summarise(post_start=last(post_start),
+            ccg_id=last(ccg_id)) %>%
+  inner_join(df_ccg_count,by=join_by(ccg_id==pct_id))
+
+
+
+df_practices_id <- read_csv(here::here(directory_name,"practices.csv"))  %>%
+  inner_join(df_atorvastatin_prac_20_list, by = join_by(code==practice)) %>%
+  mutate(post_start=substr(postcode,1,3)) %>%
+  group_by(post_start,ccg_id) %>%
+  summarise(post_start=last(post_start),
+            ccg_id=last(ccg_id)) %>%
+  inner_join(df_ccg_count,by=join_by(ccg_id==pct_id)) %>%
+  group_by(post_start) %>%
+  summarise(counter=row_number(post_start)) %>%
+  summarise(counter=last(counter),
+            post_start=last(post_start)) %>%
+  filter(counter>1) %>%
+  summarise(post_start)
+
+ df_practices_multi<-df_practices_id %>%
+  left_join(df_practices)  %>%
+  group_by(post_start) %>%
+  summarise(counter=sum(counter))
+
+
+
+
+id_practices_FY5 <-  read_csv(here::here(directory_name,"practices.csv")) %>%
+  mutate(post_start=substr(postcode,1,3)) %>%
+  filter(post_start=="FY5") %>%
+  inner_join(df_atorvastatin_prac_20_list, by = join_by(code==practice)) %>%
+  group_by(code) %>%
+  summarise(code=last(code)) %>%
+  unlist()
+
+
+
+for (practice_code in id_practices_FY5){print(practice_code)
+ccg_id <- read_csv(here::here(directory_name,"practices.csv")) %>%
+    filter(code==practice_code) %>%
+    group_by(ccg_id) %>%
+    summarise(ccg_id=last(ccg_id)) %>%
+    unlist()
+df_plot <- df_atorvastatin_prac_20_list %>%
+    filter(practice==practice_code) %>%
+    ggplot(aes(x = month, y = rate)) +
+    geom_line() +
+    scale_y_continuous(labels = label_comma()) +
+    scale_x_date(date_breaks = "4 months") +
+    theme(axis.text.x = element_text(angle =90)) +
+    geom_vline(xintercept=get(glue("date_atorvastatin_ng")), linetype="dashed") +
+    ylab("Rate per 1000 patients") +
+    ggtitle(glue("Practice_{practice_code} Sub ICB Location_{ccg_id}"))
+  ggsave(
+    filename = here::here(
+      "output",
+      "descriptive",
+      "al1",
+      glue("atorvastatin_{practice_code}_{ccg_id}_plot.png")),
+    df_plot,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+  
+}
+
+df_practices_FY5 <-  df_practices %>%
+  filter(post_start=="FY5") %>%
+  ungroup() %>%
+  dplyr::select(ccg_id) %>%
+  unlist()
+
+for (ccg_code in df_practices_FY5){
+  print(ccg_code)
+
+practice_ids <- df_atorvastatin_prac_20_list %>%
+    inner_join(read_csv(here::here(directory_name,"practices.csv")),by=join_by(practice==code)) %>%
+    filter(ccg_id==ccg_code) %>%
+    group_by(practice) %>%
+    summarise(practice=last(practice)) %>%
+    head(n=100) %>%
+    unlist()
+
+for (prac_code in practice_ids){
+
+df_plot <- df_atorvastatin_prac_20_list %>%
+    filter(practice==prac_code) %>%
+    ggplot(aes(x = month, y = rate)) +
+    geom_line() +
+    scale_y_continuous(labels = label_comma()) +
+    scale_x_date(date_breaks = "4 months") +
+    theme(axis.text.x = element_text(angle =90)) +
+    geom_vline(xintercept=get(glue("date_atorvastatin_ng")), linetype="dashed") +
+    ylab("Rate per 1000 patients") +
+    ggtitle(glue("Practice_{prac_code} Sub ICB Location_{ccg_code}"))
+
+  ggsave(
+    filename = here::here(
+      "output",
+      "descriptive",
+      "al1",
+      ccg_code,
+      glue("atorvastatin_{prac_code}_{ccg_code}_plot.png")),
+    df_plot,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+  
+}
+}
+
+```
+
+### Inclisiran
+
+The NICE TA modelled that 300,000 people would be prescribed Inclisiran by 2024. The overall rate has been much lower with 84,517 items prescribed between the introduction of the TA in October 2021 and July 2025. The government fast tracking of inclisiran was controversial and may have contributed to lower prescribing rates.4 We see significant regional variation in the adoption of inclisiran. In the South West there was a fairly steady increase in prescribing starting soon after the TA. In the East of England there is a lag in adoption until December 2022, where we see a steady increase. London and the South East see similar lags in adoption before gradual increases, in the North West there is a much sharper increase starting in the middle of 2023. Since inclisiran is a new treatment with a lower rate of uptake it is perhaps not surprising that we do not see a similar well defined seasonal pattern as we see in atorvastatin prescribing.    
+
+```{r}
+#| label: postcode in different sub-ICB inclisiran
+
+df_inclisiran <- read_csv("data/inclisiran_practice.csv.gz")
+
+df_inclisiran_prac_sicbl <- df_inclisiran %>% 
+  inner_join(df_hscic_practice_statistics) %>%
+  dplyr::select(practice,pct_id)
+
+n_practices_inclisiran <- df_inclisiran_prac_sicbl %>%
+  group_by(practice) %>%
+  summarise(practice = last(practice)) 
+
+n_sicbl_inclisiran <- df_inclisiran_prac_sicbl %>%
+  group_by(pct_id) %>%
+  summarise(pct_id = last(pct_id)) 
+
+
+df_inclisiran_list <- df_inclisiran %>% 
+  inner_join(df_hscic_practice_statistics %>% dplyr::select(practice,total_list_size,month)) %>%
+  mutate(rate=items/total_list_size*1000) %>%
+  group_by(month,practice) %>%
+  summarise(items= sum(items),
+            total_list_size= mean(total_list_size),
+            rate= items/ total_list_size,
+            month = as.Date(month))
+
+
+id_practices_FY5 <-  read_csv(here::here(directory_name,"practices.csv")) %>%
+  mutate(post_start=substr(postcode,1,3)) %>%
+  filter(post_start=="FY5") %>%
+  inner_join(df_inclisiran_list, by = join_by(code==practice)) %>%
+  group_by(code) %>%
+  summarise(code=last(code)) %>%
+  unlist()
+
+
+
+for (practice_code in id_practices_FY5){print(practice_code)
+
+ccg_id <- read_csv(here::here(directory_name,"practices.csv")) %>%
+    filter(code==practice_code) %>%
+    group_by(ccg_id) %>%
+    summarise(ccg_id=last(ccg_id)) %>%
+    unlist()
+
+df_plot <- df_inclisiran_list %>%
+    filter(practice==practice_code) %>%
+    ggplot(aes(x = month, y = rate)) +
+    geom_line() +
+    scale_y_continuous(labels = label_comma()) +
+    scale_x_date(date_breaks = "4 months",limits = c(date_inclisiran_ng,as.Date("2025-09-01")))  +
+    theme(axis.text.x = element_text(angle =90)) +
+    geom_vline(xintercept=get(glue("date_inclisiran_ng")), linetype="dashed") +
+    ylab("Rate per 1000 patients") +
+    ggtitle(glue("Practice_{practice_code} Sub ICB Location_{ccg_id}"))
+  
+  ggsave(
+    filename = here::here(
+      "output",
+      "descriptive",
+      "inclisiran",
+      glue("inclisiran_{practice_code}_{ccg_id}_plot.png")),
+    df_plot,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+  
+}
+
+df_practices_FY5 <-  df_practices %>%
+  filter(post_start=="FY5") %>%
+  ungroup() %>%
+  dplyr::select(ccg_id) %>%
+  unlist()
+
+for (ccg_code in df_practices_FY5){
+  print(ccg_code)
+
+practice_ids <- df_inclisiran_list %>%
+    inner_join(read_csv(here::here(directory_name,"practices.csv")),by=join_by(practice==code)) %>%
+    filter(ccg_id==ccg_code) %>%
+    group_by(practice) %>%
+    summarise(practice=last(practice)) %>%
+    head(n=100) %>%
+    unlist()
+
+for (prac_code in practice_ids){
+
+
+df_plot <- df_inclisiran_list %>%
+    filter(practice==prac_code) %>%
+    ggplot(aes(x = month, y = rate)) +
+    geom_line() +
+    scale_y_continuous(labels = label_comma()) +
+    scale_x_date(date_breaks = "4 months",limits = c(date_inclisiran_diab,as.Date("2025-09-01"))) +
+    theme(axis.text.x = element_text(angle =90)) +
+    geom_vline(xintercept=date_inclisiran_ng, linetype="dashed") +
+    ylab("Rate per 1000 patients") +
+    ggtitle(glue("Practice_{prac_code} Sub ICB Location_{ccg_code}"))
+  
+  ggsave(
+    filename = here::here(
+      "output",
+      "descriptive",
+      "inclisiran",
+      ccg_code,
+      glue("inclisiran_{prac_code}_{ccg_code}_plot.png")),
+    df_plot,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+  
+}
+}
+
+```
+
+### Tirzepatide
+
+```{r}
+#| label: postcode in different sub-ICB tirzepatide
+
+df_tirzepatide <- read_csv("data/tirzepatide_practice.csv.gz")
+
+
+
+df_tirzepatide_prac_sicbl <- df_tirzepatide %>% 
+  inner_join(df_hscic_practice_statistics) %>%
+  dplyr::select(practice,pct_id)
+
+n_practices_tirzepatide <- df_tirzepatideprac_sicbl %>%
+  group_by(practice) %>%
+  summarise(practice = last(practice)) 
+
+n_sicbl_tirzepatide <- df_tirzepatide_prac_sicbl %>%
+  group_by(pct_id) %>%
+  summarise(pct_id = last(pct_id)) 
+
+
+df_tirzepatide_list <- df_tirzepatide %>% 
+  inner_join(df_hscic_practice_statistics %>% dplyr::select(practice,total_list_size,month)) %>%
+  mutate(rate=items/total_list_size*1000) %>%
+  group_by(month,practice) %>%
+  summarise(items= sum(items),
+            total_list_size= mean(total_list_size),
+            rate= items/ total_list_size,
+            month = as.Date(month))
+
+
+id_practices_FY5 <-  read_csv(here::here(directory_name,"practices.csv")) %>%
+  mutate(post_start=substr(postcode,1,3)) %>%
+  filter(post_start=="FY5") %>%
+  inner_join(df_tirzepatide_list, by = join_by(code==practice)) %>%
+  group_by(code) %>%
+  summarise(code=last(code)) %>%
+  unlist()
+
+
+
+for (practice_code in id_practices_FY5){print(practice_code)
+
+ccg_id <- read_csv(here::here(directory_name,"practices.csv")) %>%
+    filter(code==practice_code) %>%
+    group_by(ccg_id) %>%
+    summarise(ccg_id=last(ccg_id)) %>%
+    unlist()
+
+df_plot <- df_tirzepatide_list %>%
+    filter(practice==practice_code) %>%
+    ggplot(aes(x = month, y = rate)) +
+    geom_line() +
+    scale_y_continuous(labels = label_comma()) +
+    scale_x_date(date_breaks = "4 months",limits = c(date_tirzepatide_diab,as.Date("2025-09-01")))  +
+    theme(axis.text.x = element_text(angle =90)) +
+    geom_vline(xintercept=date_tirzepatide_ng, linetype="dashed") +
+    geom_vline(xintercept=date_tirzepatide_diab, linetype="dashed") +
+    ylab("Rate per 1000 patients") +
+    ggtitle(glue("Practice_{practice_code} Sub ICB Location_{ccg_id}"))
+  
+  ggsave(
+    filename = here::here(
+      "output",
+      "descriptive",
+      "tirzepatide",
+      "FY5",
+      glue("tirzepatide_{practice_code}_{ccg_id}_plot.png")),
+    df_plot,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+  
+}
+
+df_practices_FY5 <-  df_practices %>%
+  filter(post_start=="FY5") %>%
+  ungroup() %>%
+  dplyr::select(ccg_id) %>%
+  unlist()
+
+for (ccg_code in df_practices_FY5){
+  print(ccg_code)
+
+practice_ids <- df_tirzepatide_list %>%
+    inner_join(read_csv(here::here(directory_name,"practices.csv")),by=join_by(practice==code)) %>%
+    filter(ccg_id==ccg_code) %>%
+    group_by(practice) %>%
+    summarise(practice=last(practice)) %>%
+    head(n=100) %>%
+    unlist()
+
+for (prac_code in practice_ids){
+
+
+df_plot <- df_tirzepatide_list %>%
+    filter(practice==prac_code) %>%
+    ggplot(aes(x = month, y = rate)) +
+    geom_line() +
+    scale_y_continuous(labels = label_comma()) +
+    scale_x_date(date_breaks = "4 months",limits = c(date_tirzepatide_diab,as.Date("2025-09-01"))) +
+    theme(axis.text.x = element_text(angle =90)) +
+    geom_vline(xintercept=get(glue("date_tirzepatide_ng")), linetype="dashed") +
+    geom_vline(xintercept=date_tirzepatide_diab, linetype="dashed") +
+    ylab("Rate per 1000 patients") +
+    ggtitle(glue("Practice_{prac_code} Sub ICB Location_{ccg_code}"))
+  
+  ggsave(
+    filename = here::here(
+      "output",
+      "descriptive",
+      "tirzepatide",
+      "FY5",
+      ccg_code,
+      glue("tirzepatide_{prac_code}_{ccg_code}_plot.png")),
+    df_plot,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+  
+}
+}
+
+```

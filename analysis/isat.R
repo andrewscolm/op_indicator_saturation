@@ -9,12 +9,13 @@ library(stringr)
 library(ggplot2)
 library(scales)
 library('forecast')
+library(lubridate) # interval
 
 source("analysis/design.R")
 # source("analysis/isat/change_detection.R")
 
-start_date<-as.Date("2023/02/01")
-end_date <- as.Date("2025/06/01")
+start_date_atorvastatin<-as.Date("2023/02/01")
+end_date_atorvastatin <- as.Date("2025/06/01")
 
 df_atorvastatin <- read_csv(here::here(directory_name,"atorvastatin_list.csv")) %>%
   filter(str_detect(bnf_name, '20')) %>%
@@ -63,7 +64,7 @@ exploratory_plots <-function(df,bnf_name){
      theme(axis.text.x = element_text(angle =90)) +
      geom_vline(xintercept=get(glue("date_{bnf_name}_ng")), linetype="dashed") +
     geom_vline(xintercept=get(glue("date_{bnf_name}_diab")), linetype="dotted") +
-     ylab("Rate")
+     ylab("items dispensed per 1,000 patients")
          
    ggsave(
      filename = here::here(
@@ -84,7 +85,7 @@ shape_dataframe<-function(df){
   assign("df_shape",df %>%
       mutate(month= as.Date(month)) %>%
         group_by(region) %>%
-        complete(month = seq.Date(min(start_date), max(end_date), by="month")) %>%
+        complete(month = seq.Date(min(month), max(month), by="month")) %>%
         ungroup() %>%
         rename(ratio_quantity = rate,
                code = region) %>%
@@ -99,7 +100,7 @@ shape_dataframe<-function(df){
 data_pick<-function(df_shape){
   assign("df.pick",df_shape %>%
            select(month,contains("ratio_quantity")) %>%
-           arrange(region,month),
+           arrange(month),
          envir = .GlobalEnv)
   
   assign("names.rel", names(df.pick %>% 
@@ -108,13 +109,19 @@ data_pick<-function(df_shape){
   assign("vars",length(names.rel),envir = .GlobalEnv)
 }
 
+get_knownt <- function(df,bnf_name){
+  assign("known.t",interval(min(df$month),get(glue("date_{bnf_name}_ng")))%/% months(1) ,envir = .GlobalEnv)
+}
+
 
 
 for (bnf_name in bnf_names){
 get_data(bnf_name)
+get_knownt(df,bnf_name)
 exploratory_plots(df,bnf_name)
 shape_dataframe(df)
 data_pick(df_shape)
+}
 
 result.list <- list()
 
@@ -425,12 +432,12 @@ for (i in 1:(vars)) {
   #### Save analysis plots      
   if (saveplots_analysis){
     filename <- paste(fig_path_tis_analysis,"/",bnf_name, "/",results$name[i], ".png", sep="")
-    wid <- 500
-    hei <- 500
-    png(filename)
+    wid <- 40
+    hei <- 15
+    png(filename,width= 30,height=15,units="cm",res = 600)
     par(mfrow=c(1,1))
     islstr.res$aux$y[islstr.res$aux$y == 99] <- NA
-    plot(islstr.res$aux$y, col="black", ylab="Numerator over denominator", xlab="Time series months", type="l",las=1) ##
+    plot(islstr.res$aux$y, col="black", ylab="", xlab="Time series months", type="l",las=1) ##
     trendline <- tis.path$indic.fit$indic.fit+islstr.res$coefficients[islstr.res$specific.spec["mconst"]]
     lines(trendline,  col="red", lwd=2) ###fitted lines
     if (nbreak > 0){

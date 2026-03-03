@@ -14,7 +14,7 @@ verbose <- T
 sample <- F
 measure <- F
 custom_measure <- F
-direction <- "both"
+direction <- "up"
 use_cache <- T
 overwrite <- F
 draw_figures <- 'yes'

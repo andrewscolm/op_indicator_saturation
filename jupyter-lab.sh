@@ -162,3 +162,5 @@ if [[ -z "$winpty_path" ]]; then
 else
   "$winpty_path" -- docker "${docker_args[@]}"
 fi
+
+read -p "Press any key to continue" x

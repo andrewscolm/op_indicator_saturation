@@ -1,0 +1,138 @@
+---
+title: "Descriptive Paper"
+format: html
+---
+
+## OpenPrescibing
+
+Data is from ......
+
+#### Inclisiran
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(readr)
+library(here)
+library(glue)
+library(dplyr)
+library(tidyr)
+library(gets)
+library(caTools)
+library(stringr)
+library(ggplot2)
+library(scales)
+library(segmented)
+library(mcp)
+library(lubridate)
+
+source("analysis/design.R")
+
+source("analysis/imports.R")
+
+label_number_n <- label_number(1, 1, big.mark=",")
+label_perc_n <- label_percent(accuracy =.0001)
+
+```
+
+```{r}
+#| label: import-data
+#| include: false
+
+
+
+df_inclisiran <- read_csv(here::here(directory_name,"inclisiran_practice.csv.gz")) %>%
+  left_join(df_stats_prac_full) %>%
+  group_by(month,practice) %>%
+  summarise(items=sum(items),
+            total_list_size=mean(total_list_size * 1000),
+            rate = items / total_list_size) %>%
+  ungroup()
+
+df_inclisiran_months <- df_inclisiran %>%
+group_by(practice) %>%
+  mutate(counter = row_number(practice))%>%
+  summarise(counter=last(counter)) 
+
+
+
+
+```
+
+individual practice
+
+```{r}
+#| label: individual-model
+#| include: false
+
+
+df_inclisiran_j83002 <- df_inclisiran %>%
+  filter(practice=="J83002") %>%
+  mutate(time = as.numeric(interval(min(month),month) %/% months(1)+1)) %>%
+  dplyr::select(time,rate,practice)
+
+
+fit_lm_inclisiran_j83002 <- lm(rate ~ 1 + time, data = df_inclisiran_j83002)
+
+segments<- selgmented(fit_lm_inclisiran_j83002)
+n_selected<- segments$selection.psi$npsi
+
+fit_segmented_1 = segmented(fit_lm_inclisiran_j83002, seg.Z = ~time, npsi = 1)
+fit_segmented_2 = segmented(fit_lm_inclisiran_j83002, seg.Z = ~time, npsi = 2)
+fit_segmented_3 = segmented(fit_lm_inclisiran_j83002, seg.Z = ~time, npsi = 3)
+fit_segmented_4 = segmented(fit_lm_inclisiran_j83002, seg.Z = ~time, npsi = 4)
+
+fit_segmented_selected = segmented(fit_lm_inclisiran_j83002, seg.Z = ~time, npsi = n_selected)
+
+summary(fit_segmented)
+summary(fit_segmented_2)
+summary(fit_segmented_3)
+summary(fit_segmented_4)
+
+```
+
+```{r}
+#| label: plotting-individual
+#| include: false
+
+ plot_inclisiran <- df_inclisiran_j83002 %>%
+   ggplot(aes(x = time, y = rate)) +
+   geom_line() + 
+   scale_y_continuous(labels = label_comma()) 
+
+  
+  ggsave(
+    filename = here::here(
+      "output",
+      "segmented",
+      "inclisiran",
+      "J83002_explore.png"),
+    plot_inclisiran,
+    dpi = 600,
+    width = 40,
+    height = 15,
+    units = "cm",
+    create.dir = T
+  )
+```
+
+```{r}
+#| label: plotting-segmented-individual
+#| include: false
+
+
+filename <-paste("output/segmented","/","inclisiran", "/","J83002_2", ".png", sep="")
+
+
+
+png(filename,width= 30,height=15,units="cm",res = 600)
+
+plot(fit_segmented_2, ylim= c(min(df_inclisiran_j83002$rate,na.rm=T),max(df_inclisiran_j83002$rate,na.rm=T)))
+lines(df_inclisiran_j83002)
+lines.segmented(fit_segmented_2)
+points.segmented(fit_segmented_2)
+
+dev.off()
+```
+

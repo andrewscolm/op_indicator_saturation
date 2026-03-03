@@ -25,3 +25,10 @@ __pycache__/
 # Linux trash directories
 .Trash-*/
 .Rproj.user
+
+# Output folder
+/output/*
+
+# r history
+.Rhistory
+.RData
