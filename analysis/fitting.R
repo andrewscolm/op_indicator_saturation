@@ -138,7 +138,11 @@ model = list(
 ex = mcp_example("demo")
 fit = mcp(model,par_x = "time", data = df_mcp)
 #pp_check(fit)
-plot_a<-plot(fit, geom_data="line",q_fit = 0.5,cp_dens=F) +
+# Median fit (previously q_fit = 0.5)
+fitted_median = fitted(fit, newdata = interpolate_newdata(fit), summary = FALSE) %>%
+  summarise(.epred = median(.epred), .by = time)
+plot_a<-plot(fit, geom_data="line",cp_dens=F) +
+  geom_line(aes(x = time, y = .epred), data = fitted_median, inherit.aes = FALSE, color = "red", linetype = "dashed") +
   theme_light()
 fixef(fit)
 ggsave(
